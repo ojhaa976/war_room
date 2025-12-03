@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICAI EXAM COMMAND CENTRE - JAN 2026</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'icai-blue': '#003366',
+                        'icai-accent': '#00AEEF',
+                        'icai-gold': '#C5A059', 
+                        'icai-text': '#333333',
+                        'icai-bg': '#F4F7FA',
+                        'icai-success': '#10B981',
+                        'icai-danger': '#EF4444',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Menlo', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { background-color: #F4F7FA; color: #333; font-family: 'Inter', sans-serif; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #e2e8f0; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        .nav-btn.active { background-color: #003366; color: white; border-right: 4px solid #C5A059; }
+        .loader {
+            border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #003366;
+            width: 16px; height: 16px; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Markdown Styles */
+        .ai-content strong { color: #003366; font-weight: 700; }
+        .ai-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.5rem; }
+        .ai-content ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.5rem; }
+        .ai-content p { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl p-8 w-[28rem] shadow-2xl border border-slate-200">
+            <h3 class="text-xl font-bold text-icai-blue mb-2">⚙️ SYSTEM CONFIGURATION</h3>
+            <p class="text-sm text-slate-500 mb-6">Enter Gemini API Key to activate AI Examiner.</p>
+            <div class="space-y-4">
+                <input type="password" id="api-key-input" placeholder="API Key" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-icai-blue outline-none font-mono text-sm">
+                <button onclick="saveApiKey()" class="w-full py-3 bg-icai-blue text-white rounded-lg font-bold hover:bg-blue-900 shadow-md">ACTIVATE SYSTEM</button>
+                <button onclick="toggleSettings()" class="w-full py-2 text-slate-500 text-sm hover:text-slate-800">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOG SESSION MODAL -->
+    <div id="log-session-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl p-6 w-96 shadow-2xl border border-slate-200">
+            <h3 class="text-lg font-bold text-icai-blue mb-2">📝 LOG OPERATION</h3>
+            <p class="text-xs text-slate-500 mb-4">You completed a session. Categorize it.</p>
+            <div class="space-y-3">
+                <button onclick="commitSession('new')" class="w-full py-3 bg-icai-blue text-white rounded-lg font-bold text-sm hover:bg-blue-900">📚 NEW TOPIC COVERAGE</button>
+                <button onclick="commitSession('revision')" class="w-full py-3 bg-icai-gold text-white rounded-lg font-bold text-sm hover:bg-yellow-600">🔄 REVISION CYCLE</button>
+                <button onclick="closeLogModal()" class="w-full py-2 text-slate-400 text-xs hover:text-slate-600">DISCARD LOG</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <nav class="bg-white md:w-64 w-full md:h-full flex-shrink-0 border-r border-slate-200 flex flex-col z-10">
+        <div class="p-6 border-b border-slate-100 bg-icai-blue text-white">
+            <h1 class="text-lg font-extrabold tracking-wide">ICAI COMMAND</h1>
+            <p class="text-[10px] text-blue-200 mt-1 uppercase tracking-widest">Jan 2026 Protocol</p>
+        </div>
+        
+        <div class="flex-1 py-4 space-y-1 overflow-y-auto">
+            <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn active w-full text-left px-6 py-3 text-sm font-semibold transition-all">
+                📊 DASHBOARD & OPS
+            </button>
+            <button onclick="switchTab('syllabus')" id="btn-syllabus" class="nav-btn w-full text-left px-6 py-3 text-sm font-semibold transition-all text-slate-600 hover:bg-slate-50">
+                📚 SYLLABUS TRACKER
+            </button>
+            <button onclick="switchTab('planner')" id="btn-planner" class="nav-btn w-full text-left px-6 py-3 text-sm font-semibold transition-all text-slate-600 hover:bg-slate-50">
+                ⚡ DAILY PLANNER
+            </button>
+             <button onclick="switchTab('auditor')" id="btn-auditor" class="nav-btn w-full text-left px-6 py-3 text-sm font-semibold transition-all text-slate-600 hover:bg-slate-50">
+                📸 ANSWER AUDITOR
+            </button>
+            <button onclick="switchTab('armory')" id="btn-armory" class="nav-btn w-full text-left px-6 py-3 text-sm font-semibold transition-all text-slate-600 hover:bg-slate-50">
+                🗄️ ARMORY (RTP/MTP)
+            </button>
+        </div>
+        
+        <div class="p-4 border-t border-slate-100">
+            <button onclick="toggleSettings()" class="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-icai-blue transition-colors">
+                <span>⚙️ API SETTINGS</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN AREA -->
+    <main class="flex-1 overflow-y-auto bg-[#F4F7FA] p-4 md:p-8 relative">
+        
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="space-y-6 animate-fade-in">
+            <header class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-icai-blue">EXAM STATUS REPORT</h2>
+                    <p class="text-sm text-slate-500">Target: Jan 2026 • New Syllabus Scheme</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-3xl font-mono font-bold text-icai-blue" id="days-count">000</div>
+                    <div class="text-[10px] uppercase font-bold text-slate-400">Days to Exam</div>
+                </div>
+            </header>
+
+            <!-- Main Progress -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col md:flex-row gap-8 items-center">
+                <div class="flex-1 w-full">
+                    <h3 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">Syllabus Completion</h3>
+                    <div class="w-full bg-slate-100 rounded-full h-4 mb-2">
+                        <div id="main-progress-bar" class="bg-icai-success h-4 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-500">
+                        <span>Based on tracked chapters</span>
+                        <span id="main-progress-text" class="font-bold text-icai-blue">0% Completed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SESSION ANALYTICS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-icai-blue">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase">Total Sessions</p>
+                            <h3 class="text-3xl font-bold text-slate-800 mt-1" id="stat-sessions-done">0</h3>
+                        </div>
+                        <span class="text-2xl">✅</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3">Completed 90-min blocks</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-icai-gold">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase">Revision Blocks</p>
+                            <h3 class="text-3xl font-bold text-slate-800 mt-1" id="stat-revision-done">0</h3>
+                        </div>
+                        <span class="text-2xl">🔄</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3">Consolidation sessions</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-icai-danger">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase">Est. Sessions Left</p>
+                            <h3 class="text-3xl font-bold text-slate-800 mt-1" id="stat-sessions-left">0</h3>
+                        </div>
+                        <span class="text-2xl">🎯</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3">To finish pending syllabus</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ARMORY (RTP/MTP) VIEW -->
+        <section id="view-armory" class="hidden space-y-6">
+            <header class="mb-6">
+                <h2 class="text-2xl font-bold text-icai-blue">🗄️ THE ARMORY</h2>
+                <p class="text-sm text-slate-500">Official Resources, Mock Tests & Performance Tracking.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- 1. Official Uplinks -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-icai-blue mb-4 flex items-center gap-2">🔗 OFFICIAL UPLINKS</h3>
+                    <div class="space-y-3">
+                        <a href="https://boslive.icai.org/" target="_blank" class="block p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 transition-colors flex justify-between items-center group">
+                            <span>BoS Knowledge Portal</span>
+                            <span class="text-xs text-slate-400 group-hover:text-icai-blue">↗</span>
+                        </a>
+                        <a href="https://www.icai.org/post/foundation-course-study-material" target="_blank" class="block p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 transition-colors flex justify-between items-center group">
+                            <span>Study Material (PDFs)</span>
+                            <span class="text-xs text-slate-400 group-hover:text-icai-blue">↗</span>
+                        </a>
+                        <a href="https://www.icai.org/post/revision-test-papers-foundation" target="_blank" class="block p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 transition-colors flex justify-between items-center group">
+                            <span>Revision Test Papers (RTP)</span>
+                            <span class="text-xs text-slate-400 group-hover:text-icai-blue">↗</span>
+                        </a>
+                        <a href="https://www.icai.org/post/mock-test-papers-foundation" target="_blank" class="block p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 transition-colors flex justify-between items-center group">
+                            <span>Mock Test Papers (MTP)</span>
+                            <span class="text-xs text-slate-400 group-hover:text-icai-blue">↗</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 2. AI Mock Generator -->
+                <div class="bg-gradient-to-br from-icai-blue to-slate-900 text-white p-6 rounded-xl shadow-lg lg:col-span-2 flex flex-col">
+                    <h3 class="font-bold text-yellow-400 mb-2">🤖 INSTANT AI MOCK GENERATOR</h3>
+                    <p class="text-xs text-blue-200 mb-6">Can't access PDFs? Generate a simulated RTP/MTP instantly for practice.</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-blue-300">Subject</label>
+                            <select id="mock-subject" class="w-full mt-1 p-2 rounded bg-white/10 border border-white/20 text-white text-sm outline-none">
+                                <option value="Accounting">Accounting</option>
+                                <option value="Business Laws">Business Laws</option>
+                                <option value="Mathematics">Quant Aptitude</option>
+                                <option value="Economics">Economics</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-blue-300">Simulation Type</label>
+                            <select id="mock-type" class="w-full mt-1 p-2 rounded bg-white/10 border border-white/20 text-white text-sm outline-none">
+                                <option value="RTP">RTP Style (Revision)</option>
+                                <option value="MTP">MTP Style (Mock Test)</option>
+                                <option value="PYQ">Past Year Simulation</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="generateMock()" class="w-full py-3 bg-icai-gold text-icai-blue font-bold rounded-lg hover:bg-white transition-colors shadow-lg mb-6">GENERATE SIMULATION</button>
+
+                    <!-- Mock Output -->
+                    <div id="mock-output-area" class="bg-white/10 rounded-lg p-4 flex-1 hidden overflow-y-auto custom-scroll max-h-96 text-sm text-blue-50 ai-content font-mono">
+                        <!-- AI Content -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Performance Log -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-700">📊 MOCK TEST SCOREBOARD</h3>
+                    <button onclick="addMockScore()" class="text-xs bg-icai-blue text-white px-3 py-1 rounded hover:bg-blue-800">+ Add Score</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-slate-600">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-50">
+                            <tr>
+                                <th class="px-4 py-3">Date</th>
+                                <th class="px-4 py-3">Paper Type</th>
+                                <th class="px-4 py-3">Subject</th>
+                                <th class="px-4 py-3">Score</th>
+                                <th class="px-4 py-3">Verdict</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mock-score-body">
+                            <!-- JS Injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SYLLABUS TRACKER VIEW -->
+        <section id="view-syllabus" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row gap-6 h-[calc(100vh-8rem)]">
+                <div class="w-full md:w-1/2 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col">
+                    <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-xl">
+                        <h3 class="font-bold text-icai-blue">CHAPTER TRACKER</h3>
+                        <select id="subject-selector" onchange="renderChapters()" class="text-xs p-2 border rounded bg-white font-semibold outline-none">
+                            <option value="accounts">Accounting</option>
+                            <option value="law">Business Laws</option>
+                            <option value="math">Quant Aptitude</option>
+                            <option value="eco">Economics</option>
+                        </select>
+                    </div>
+                    <div id="chapter-list" class="p-4 overflow-y-auto custom-scroll flex-1 space-y-2"></div>
+                </div>
+                <div class="w-full md:w-1/2 flex flex-col gap-4">
+                    <div class="bg-gradient-to-br from-icai-blue to-slate-900 rounded-xl p-6 text-white shadow-lg">
+                        <h3 class="font-bold flex items-center gap-2 mb-2 text-yellow-400">🎓 CHIEF EXAMINER AI</h3>
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" id="ai-concept-query" placeholder="Ex: Define 'Consideration' as per ICAI..." class="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none">
+                            <button onclick="askExaminer()" class="bg-white text-icai-blue px-4 py-2 rounded-lg font-bold text-xs hover:bg-blue-50">ASK</button>
+                        </div>
+                        <div id="ai-concept-output" class="text-sm font-mono bg-black/20 p-4 rounded-lg min-h-[100px] text-blue-100 hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DAILY PLANNER VIEW -->
+        <section id="view-planner" class="hidden space-y-6">
+             <div class="flex flex-col lg:flex-row gap-6">
+                <!-- Config Panel -->
+                <div class="w-full lg:w-1/3 space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="font-bold text-icai-blue mb-4">🗓️ SESSION PLANNER</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase">Start Time</label>
+                                <input type="time" id="start-time" value="07:00" class="w-full mt-1 p-2 border rounded-lg text-sm bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase">Duration (Hours)</label>
+                                <select id="study-hours" class="w-full mt-1 p-2 border rounded-lg text-sm bg-slate-50">
+                                    <option value="4">4 Hours (Revision)</option>
+                                    <option value="8">8 Hours (Full Day)</option>
+                                    <option value="12">12 Hours (Marathon)</option>
+                                </select>
+                            </div>
+                            <button onclick="generatePlan()" class="w-full py-3 bg-icai-blue text-white rounded-lg font-bold shadow-md hover:bg-blue-900 transition-transform active:scale-95">GENERATE SCHEDULE</button>
+                        </div>
+                    </div>
+
+                    <!-- Active Focus Timer -->
+                    <div id="timer-panel" class="bg-icai-blue text-white p-6 rounded-xl shadow-lg hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-yellow-400">⏳ EXAM MODE</h3>
+                            <span class="text-xs bg-white/20 px-2 py-1 rounded">DO NOT DISTURB</span>
+                        </div>
+                        <div class="text-center py-6">
+                            <div id="timer-display" class="text-5xl font-mono font-bold tracking-widest">00:00</div>
+                            <div class="text-xs text-blue-200 mt-2 uppercase tracking-widest">Remaining</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="stopTimer()" class="flex-1 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-bold text-xs">ABORT</button>
+                            <button onclick="finishSession()" class="flex-1 py-2 bg-icai-success hover:bg-green-600 rounded-lg font-bold text-xs text-white">COMPLETE</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule Output -->
+                <div class="w-full lg:w-2/3">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 min-h-[500px]">
+                        <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                            <h3 class="font-bold text-slate-700">TODAY'S OPERATIONS</h3>
+                        </div>
+                        <div id="schedule-list" class="space-y-3">
+                            <div class="text-center text-slate-400 py-12 italic">Set parameters and click Generate Schedule</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ANSWER AUDITOR VIEW -->
+        <section id="view-auditor" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <header class="mb-6">
+                    <h2 class="text-2xl font-bold text-icai-blue">📸 ANSWER SHEET AUDITOR</h2>
+                    <p class="text-sm text-slate-500">Upload your handwritten answer. The AI will audit Presentation, Underlining, and Section references.</p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <input type="text" id="audit-question" placeholder="Enter Question Topic (e.g., 'Separate Legal Entity Case Law')" class="w-full p-3 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:border-icai-blue">
+                        <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:bg-slate-50 transition-colors relative">
+                            <input type="file" id="answer-upload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleImagePreview(this)">
+                            <div class="space-y-2" id="upload-placeholder">
+                                <div class="text-4xl">📸</div>
+                                <div class="text-sm font-bold text-slate-600">Click to Upload Answer Sheet</div>
+                                <div class="text-xs text-slate-400">Supports JPG, PNG (Max 5MB)</div>
+                            </div>
+                            <img id="image-preview" class="hidden max-h-64 mx-auto rounded shadow-sm object-contain">
+                        </div>
+                        <div class="text-center text-xs text-slate-400 font-bold">- OR TYPE ANSWER -</div>
+                        <textarea id="audit-text-fallback" placeholder="Type text manually here if image fails..." class="w-full h-24 p-3 border border-slate-300 rounded-lg text-sm font-mono outline-none resize-none"></textarea>
+                        <button onclick="auditAnswerWithImage()" class="w-full py-3 bg-icai-success text-white rounded-lg font-bold hover:bg-green-600 shadow-md transition-colors">START AI EVALUATION</button>
+                    </div>
+                    <div class="bg-slate-50 rounded-lg p-6 border border-slate-200 flex flex-col">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4">Examiner's Remarks</h3>
+                        <div id="audit-result" class="text-sm text-slate-600 space-y-4 flex-1 overflow-y-auto custom-scroll">
+                            <div class="flex items-center gap-2 text-slate-400 italic"><span>Waiting for submission...</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let apiKey = localStorage.getItem('icai_api_key') || "";
+        let timerInterval;
+        let syllabusState = JSON.parse(localStorage.getItem('icai_syllabus_progress')) || { accounts: [], law: [], math: [], eco: [] };
+        let sessionStats = JSON.parse(localStorage.getItem('icai_session_stats')) || { newSessions: 0, revisionSessions: 0 };
+        let mockScores = JSON.parse(localStorage.getItem('icai_mock_scores')) || [];
+
+        // --- DATA ---
+        const chapters = {
+            accounts: ["Ch 1: Theoretical Framework", "Ch 2: Accounting Process", "Ch 3: BRS", "Ch 4: Inventories", "Ch 5: Depreciation", "Ch 6: Bill of Exchange", "Ch 7: Final Accounts", "Ch 8: NPO", "Ch 9: Company Accounts", "Ch 10: Partnership"],
+            law: ["Ch 1: Indian Regulatory Framework", "Ch 2: Indian Contract Act", "Ch 3: Sale of Goods Act", "Ch 4: Partnership Act", "Ch 5: LLP Act", "Ch 6: Companies Act", "Ch 7: Negotiable Instruments"],
+            math: ["Ch 1: Ratio & Prop", "Ch 2: Equations", "Ch 3: Linear Inequalities", "Ch 4: TVM", "Ch 5: Permutations", "Ch 6: AP/GP", "Ch 7: Sets", "Ch 8: Calculus", "Ch 9: Number Series", "Ch 10: Direction Test", "Ch 11: Seating Arr", "Ch 12: Blood Relations", "Ch 13: Statistical Desc", "Ch 14: Central Tendency", "Ch 15: Probability", "Ch 16: Theoretical Dist", "Ch 17: Correlation", "Ch 18: Index Numbers"],
+            eco: ["Ch 1: Intro to Eco", "Ch 2: Consumer Behaviour", "Ch 3: Supply & Production", "Ch 4: Price Determination", "Ch 5: Business Cycles", "Ch 6: National Income", "Ch 7: Public Finance", "Ch 8: Money Market", "Ch 9: Int Trade", "Ch 10: Indian Economy"]
+        };
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDashboard();
+            renderChapters();
+            renderMockScores();
+        });
+
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            ['dashboard', 'syllabus', 'planner', 'auditor', 'armory'].forEach(id => {
+                document.getElementById(`view-${id}`).classList.add('hidden');
+                document.getElementById(`btn-${id}`).classList.remove('active', 'bg-blue-50');
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`btn-${tabId}`).classList.add('active');
+        }
+
+        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
+        function saveApiKey() {
+            const key = document.getElementById('api-key-input').value.trim();
+            if(key) { apiKey = key; localStorage.setItem('icai_api_key', key); toggleSettings(); alert("System Activated."); }
+        }
+
+        // --- DASHBOARD ---
+        function updateDashboard() {
+            let totalChapters = 0, completedChapters = 0;
+            Object.keys(chapters).forEach(sub => {
+                totalChapters += chapters[sub].length;
+                completedChapters += (syllabusState[sub] || []).length;
+            });
+            const pct = Math.round((completedChapters / totalChapters) * 100) || 0;
+            document.getElementById('main-progress-bar').style.width = `${pct}%`;
+            document.getElementById('main-progress-text').innerText = `${pct}% Completed`;
+            document.getElementById('stat-sessions-done').innerText = sessionStats.newSessions;
+            document.getElementById('stat-revision-done').innerText = sessionStats.revisionSessions;
+            const remainingChapters = totalChapters - completedChapters;
+            document.getElementById('stat-sessions-left').innerText = Math.ceil(remainingChapters * 2.5);
+            
+            const examDate = new Date('2026-01-15');
+            const diff = examDate - new Date();
+            document.getElementById('days-count').innerText = Math.ceil(diff / (1000 * 60 * 60 * 24)) > 0 ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : "0";
+        }
+
+        // --- MOCK TEST LOGIC (ARMORY) ---
+        async function generateMock() {
+            if(!apiKey) { alert("Please set API Key first."); return; }
+            
+            const subject = document.getElementById('mock-subject').value;
+            const type = document.getElementById('mock-type').value;
+            const output = document.getElementById('mock-output-area');
+            
+            output.innerHTML = '<div class="flex items-center gap-2"><div class="loader"></div> <span>Generating Paper...</span></div>';
+            output.classList.remove('hidden');
+
+            const systemPrompt = `You are the ICAI Board of Studies. Generate a short ${type} (Revision/Mock Test) simulation for CA Foundation Subject: ${subject}.
+            
+            Rules:
+            1. If Subject is Math/Eco: Generate 5 MCQs with tricky options.
+            2. If Subject is Accounts/Law: Generate 2 Case Study/Practical scenarios.
+            3. Tone: Formal, Exam-style.
+            4. Add "ANSWERS" at the very bottom, separated by a line.`;
+
+            try {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: "Generate Paper" }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    })
+                });
+                const data = await resp.json();
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                output.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            } catch(e) {
+                output.innerHTML = "Error creating test.";
+            }
+        }
+
+        function addMockScore() {
+            const date = new Date().toLocaleDateString();
+            const subject = prompt("Subject (Acc/Law/Math/Eco):");
+            const score = prompt("Score Obtained:");
+            const total = prompt("Total Marks:", "100");
+            
+            if(subject && score) {
+                const percentage = (score/total)*100;
+                let verdict = percentage >= 50 ? "PASS" : "FAIL";
+                if(percentage >= 75) verdict = "DISTINCTION";
+                
+                mockScores.unshift({ date, type: "MOCK", subject, score: `${score}/${total}`, verdict });
+                localStorage.setItem('icai_mock_scores', JSON.stringify(mockScores));
+                renderMockScores();
+            }
+        }
+
+        function renderMockScores() {
+            const tbody = document.getElementById('mock-score-body');
+            tbody.innerHTML = mockScores.map(s => `
+                <tr class="bg-white border-b hover:bg-slate-50">
+                    <td class="px-4 py-3 font-mono text-xs">${s.date}</td>
+                    <td class="px-4 py-3 text-xs font-bold text-slate-500">${s.type}</td>
+                    <td class="px-4 py-3 font-bold text-icai-blue">${s.subject}</td>
+                    <td class="px-4 py-3 font-mono">${s.score}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded-full text-[10px] font-bold ${s.verdict === 'FAIL' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
+                            ${s.verdict}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- EXISTING UTILS (Syllabus, Planner, Image Audit, AI) ---
+        // (Re-using previous logic for brevity, fully functional in final file)
+        
+        // ... Syllabus Render ...
+        function renderChapters() {
+             const subject = document.getElementById('subject-selector').value;
+             const list = chapters[subject];
+             const container = document.getElementById('chapter-list');
+             if(!syllabusState[subject]) syllabusState[subject] = [];
+             container.innerHTML = list.map((chap, idx) => {
+                 const isChecked = syllabusState[subject].includes(idx);
+                 return `<div class="flex items-center p-3 hover:bg-slate-50 rounded border border-transparent hover:border-slate-100 transition-colors"><input type="checkbox" id="chk-${subject}-${idx}" ${isChecked ? 'checked' : ''} onchange="toggleChapter('${subject}', ${idx})" class="w-5 h-5 text-icai-blue rounded cursor-pointer accent-icai-blue"><label for="chk-${subject}-${idx}" class="ml-3 text-sm font-medium ${isChecked ? 'text-slate-400 line-through' : 'text-slate-700'} cursor-pointer select-none flex-1">${chap}</label></div>`;
+             }).join('');
+        }
+        function toggleChapter(subject, idx) {
+             const arr = syllabusState[subject];
+             if(arr.includes(idx)) syllabusState[subject] = arr.filter(i => i !== idx); else arr.push(idx);
+             localStorage.setItem('icai_syllabus_progress', JSON.stringify(syllabusState));
+             renderChapters(); updateDashboard();
+        }
+
+        // ... Planner ...
+        function generatePlan() {
+             const startStr = document.getElementById('start-time').value;
+             const hours = parseInt(document.getElementById('study-hours').value);
+             const container = document.getElementById('schedule-list');
+             let time = new Date(`2000-01-01T${startStr}`);
+             let html = '';
+             for(let i=1; i<= (hours/1.5); i++) {
+                 const sTime = time.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                 time.setMinutes(time.getMinutes() + 90);
+                 html += `<div class="flex items-center gap-4 p-4 bg-slate-50 border border-slate-200 rounded-lg"><div class="w-24 text-center"><div class="text-xs font-bold text-slate-400">SESSION ${i}</div><div class="text-sm font-mono font-bold text-slate-700">${sTime}</div></div><div class="flex-1"><div class="font-bold text-icai-blue text-sm">Study Block (90 Mins)</div></div><button onclick="startTimer(90)" class="px-4 py-2 bg-white border border-slate-200 text-icai-blue text-xs font-bold rounded hover:bg-icai-blue hover:text-white">ENGAGE</button></div>`;
+                 if(i < (hours/1.5)) { time.setMinutes(time.getMinutes() + 15); html += `<div class="flex justify-center"><div class="text-[10px] bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">15 MIN RECHARGE</div></div>`; }
+             }
+             container.innerHTML = html;
+        }
+
+        function startTimer(minutes) {
+             document.getElementById('timer-panel').classList.remove('hidden');
+             let seconds = minutes * 60;
+             clearInterval(timerInterval);
+             timerInterval = setInterval(() => {
+                 const m = Math.floor(seconds / 60);
+                 const s = seconds % 60;
+                 document.getElementById('timer-display').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+                 if(seconds <= 0) finishSession();
+                 seconds--;
+             }, 1000);
+        }
+        function stopTimer() { clearInterval(timerInterval); document.getElementById('timer-panel').classList.add('hidden'); }
+        function finishSession() { clearInterval(timerInterval); document.getElementById('timer-panel').classList.add('hidden'); document.getElementById('log-session-modal').classList.remove('hidden'); }
+        function commitSession(type) {
+             if(type === 'new') sessionStats.newSessions++;
+             if(type === 'revision') sessionStats.revisionSessions++;
+             localStorage.setItem('icai_session_stats', JSON.stringify(sessionStats));
+             updateDashboard(); document.getElementById('log-session-modal').classList.add('hidden');
+        }
+        function closeLogModal() { document.getElementById('log-session-modal').classList.add('hidden'); }
+
+        // ... Audit ...
+        let base64Image = null;
+        function handleImagePreview(input) {
+             if (input.files && input.files[0]) {
+                 const reader = new FileReader();
+                 reader.onload = function(e) {
+                     document.getElementById('image-preview').src = e.target.result;
+                     document.getElementById('image-preview').classList.remove('hidden');
+                     document.getElementById('upload-placeholder').classList.add('hidden');
+                     base64Image = e.target.result.split(',')[1];
+                 }
+                 reader.readAsDataURL(input.files[0]);
+             }
+        }
+        async function auditAnswerWithImage() {
+             const question = document.getElementById('audit-question').value;
+             const fallbackText = document.getElementById('audit-text-fallback').value;
+             const output = document.getElementById('audit-result');
+             if(!apiKey) { alert("Please set API Key."); return; }
+             output.innerHTML = "Evaluating...";
+             let userParts = [{ text: `Question: ${question}` }];
+             if (base64Image) userParts.push({ text: "Image of answer:", inlineData: { mimeType: "image/jpeg", data: base64Image } });
+             if (fallbackText) userParts.push({ text: `Text: ${fallbackText}` });
+             
+             try {
+                 const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                     method: 'POST', headers: {'Content-Type': 'application/json'},
+                     body: JSON.stringify({ contents: [{ role: "user", parts: userParts }], systemInstruction: { parts: [{ text: "You are an ICAI Examiner. Grade out of 5 based on Keywords and Section numbers." }] } })
+                 });
+                 const data = await resp.json();
+                 output.innerHTML = data.candidates?.[0]?.content?.parts?.[0]?.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+             } catch(e) { output.innerHTML = "Error."; }
+        }
+
+        async function askExaminer() {
+             const q = document.getElementById('ai-concept-query').value;
+             const output = document.getElementById('ai-concept-output');
+             if(!q || !apiKey) return;
+             output.classList.remove('hidden'); output.innerHTML = "Thinking...";
+             try {
+                 const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                     method: 'POST', headers: {'Content-Type': 'application/json'},
+                     body: JSON.stringify({ contents: [{ parts: [{ text: q }] }], systemInstruction: { parts: [{ text: "ICAI Examiner. Concise." }] } })
+                 });
+                 const data = await resp.json();
+                 output.innerHTML = data.candidates?.[0]?.content?.parts?.[0]?.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+             } catch(e) { output.innerHTML = "Error."; }
+        }
+
+    </script>
+</body>
+</html>
