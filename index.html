@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICAI FOUNDATION COMMAND v11.0 - JAN 2026</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pro-primary': '#3730a3', // Indigo 800
+                        'pro-primary-light': '#4f46e5', // Indigo 600
+                        'pro-accent': '#0d9488', // Teal 600
+                        'pro-bg': '#f8fafc', // Slate 50
+                        'pro-text': '#1e293b',
+                        'pro-danger': '#ef4444',
+                        'pro-warning': '#f59e0b',
+                        'pro-success': '#10b981',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Menlo', 'monospace'],
+                    },
+                    boxShadow: { 'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .nav-btn.active { background-color: rgba(255, 255, 255, 0.15); border-left: 4px solid #0d9488; }
+        .loader { border: 3px solid rgba(55, 48, 163, 0.1); border-top: 3px solid #3730a3; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; }
+        .status-green { background-color: #10b981; box-shadow: 0 0 8px #10b981; }
+        .status-yellow { background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+        .status-red { background-color: #ef4444; box-shadow: 0 0 8px #ef4444; animation: pulse-red 2s infinite; }
+        .ai-response strong { color: #3730a3; font-weight: 700; }
+        .ai-response ul { list-style-type: disc; margin-left: 1rem; }
+    </style>
+</head>
+<body class="h-screen flex flex-col md:flex-row overflow-hidden bg-pro-bg">
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-8 w-[28rem] shadow-2xl border border-slate-100">
+            <h3 class="text-xl font-bold text-pro-primary mb-2 flex items-center gap-2">⚙️ SYSTEM CONFIG</h3>
+            <p class="text-sm text-slate-500 mb-6">Enter Gemini API Key to activate AI Examiner.</p>
+            <div class="space-y-4">
+                <input type="password" id="api-key-input" placeholder="API Key" class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-pro-primary/20 outline-none font-mono text-sm">
+                <button onclick="saveApiKey()" class="w-full py-3 bg-pro-primary text-white rounded-xl font-bold hover:bg-pro-primary-light shadow-lg">ACTIVATE SYSTEM</button>
+                <button onclick="toggleSettings()" class="w-full py-2 text-slate-400 text-sm hover:text-slate-600">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <nav class="bg-pro-primary md:w-64 w-full md:h-full flex-shrink-0 flex flex-col z-10 shadow-xl text-white">
+        <div class="p-6 border-b border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-pro-accent rounded-lg flex items-center justify-center font-bold text-white shadow-lg">CA</div>
+                <div>
+                    <h1 class="text-sm font-extrabold tracking-wide">COMMAND v11.0</h1>
+                    <p class="text-[9px] text-indigo-200 uppercase tracking-widest">Foundation Jan '26</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex-1 px-3 py-6 space-y-1 overflow-y-auto custom-scroll">
+            <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn active w-full text-left px-4 py-3 text-sm rounded-lg hover:bg-white/10">📊 Analytics HQ</button>
+            <button onclick="switchTab('syllabus')" id="btn-syllabus" class="nav-btn w-full text-left px-4 py-3 text-sm rounded-lg hover:bg-white/10">🧠 AI & Syllabus</button>
+            <button onclick="switchTab('planner')" id="btn-planner" class="nav-btn w-full text-left px-4 py-3 text-sm rounded-lg hover:bg-white/10">🍅 Routine Gen</button>
+            <button onclick="switchTab('auditor')" id="btn-auditor" class="nav-btn w-full text-left px-4 py-3 text-sm rounded-lg hover:bg-white/10">📸 Answer Auditor</button>
+            <button onclick="switchTab('armory')" id="btn-armory" class="nav-btn w-full text-left px-4 py-3 text-sm rounded-lg hover:bg-white/10">🗄️ The Armory</button>
+        </div>
+        
+        <div class="p-4 border-t border-white/10 bg-black/10">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold text-indigo-200">READINESS</span>
+                <span id="readiness-badge" class="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded font-mono">CALCULATING...</span>
+            </div>
+            <button onclick="toggleSettings()" class="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-bold">⚙️ API Config</button>
+        </div>
+    </nav>
+
+    <!-- MAIN AREA -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 relative custom-scroll">
+        
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="space-y-6 animate-fade-in">
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Mission Status</h2>
+                    <p class="text-sm text-slate-500 font-medium">Target: <span class="text-pro-accent font-bold">Jan 2026</span> • Competency: <span id="competency-val" class="font-bold text-pro-primary">--%</span></p>
+                </div>
+                <div class="bg-white px-4 py-2 rounded-xl shadow-soft border border-slate-100 text-right">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase">Days Left</div>
+                    <div class="text-2xl font-mono font-bold text-pro-primary" id="days-count">000</div>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow-soft border-l-4 border-pro-primary">
+                    <div class="text-xs text-slate-400 font-bold uppercase">Syllabus Covered</div>
+                    <div class="text-3xl font-bold text-slate-800" id="dash-syllabus-pct">0%</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-soft border-l-4 border-pro-accent">
+                    <div class="text-xs text-slate-400 font-bold uppercase">Sessions to Mastery</div>
+                    <div class="text-3xl font-bold text-slate-800" id="dash-sessions-needed">0</div>
+                    <div class="text-[9px] text-slate-400 mt-1">Weighted Difficulty</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-soft border-l-4 border-pro-danger">
+                    <div class="text-xs text-slate-400 font-bold uppercase">Critical Revs</div>
+                    <div class="text-3xl font-bold text-red-600" id="dash-critical-revs">0</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-soft border-l-4 border-pro-warning flex flex-col justify-between">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <div class="text-[10px] text-slate-400 font-bold uppercase">Full Mock Avg</div>
+                            <div class="text-2xl font-bold text-slate-800" id="dash-full-avg">--</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-400 font-bold uppercase">Part Test Avg</div>
+                            <div class="text-xl font-bold text-slate-600" id="dash-part-avg">--</div>
+                        </div>
+                    </div>
+                    <div class="text-[9px] text-slate-400 mt-1 text-center"><span id="dash-tests-count">0</span> Logs</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100 lg:col-span-2">
+                    <h3 class="font-bold text-slate-700 mb-4">📈 Mock Score Trajectory</h3>
+                    <div class="h-64 w-full">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
+                    <h3 class="font-bold text-slate-700 mb-4">🕸️ Subject Balance</h3>
+                    <div class="h-64 w-full">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SYLLABUS & AI EXAMINER & DOUBT LOGGER -->
+        <section id="view-syllabus" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row gap-6 h-[calc(100vh-8rem)]">
+                
+                <!-- Left: Syllabus Tracker -->
+                <div class="w-full md:w-1/2 bg-white rounded-2xl shadow-soft border border-slate-100 flex flex-col">
+                    <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                        <h3 class="font-bold text-slate-700">Retention Radar</h3>
+                        <select id="subject-selector" onchange="renderChapters()" class="text-xs p-2 border rounded-lg bg-white outline-none">
+                            <option value="accounts">Accounting</option>
+                            <option value="law">Business Laws</option>
+                            <option value="math">Quant Aptitude</option>
+                            <option value="eco">Economics</option>
+                        </select>
+                    </div>
+                    <div class="p-2 bg-slate-50 text-[10px] text-center text-slate-500 flex justify-center gap-4">
+                        <span class="flex items-center gap-1"><span class="status-dot status-green"></span> Fresh (<3d)</span>
+                        <span class="flex items-center gap-1"><span class="status-dot status-yellow"></span> Review (3-7d)</span>
+                        <span class="flex items-center gap-1"><span class="status-dot status-red"></span> Decay (>7d)</span>
+                    </div>
+                    <div id="chapter-list" class="p-4 overflow-y-auto custom-scroll flex-1 space-y-2"></div>
+                </div>
+                
+                <!-- Right: AI Examiner + Doubt Logger -->
+                <div class="w-full md:w-1/2 flex flex-col gap-4">
+                    <div class="bg-pro-primary rounded-2xl p-6 text-white shadow-xl flex flex-col h-full overflow-hidden">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold flex items-center gap-2 text-pro-warning text-lg">
+                                🎓 Chief Examiner
+                            </h3>
+                            <div class="text-[10px] bg-white/10 px-2 py-1 rounded">Strict Academic Mode</div>
+                        </div>
+                        <p class="text-xs text-indigo-200 mb-4">Accepts: Accounting, Law, Math, Eco.</p>
+                        
+                        <!-- AI Answer Output -->
+                        <div id="ai-concept-output" class="bg-white/10 rounded-xl p-4 text-sm text-indigo-50 overflow-y-auto custom-scroll mb-4 hidden border border-indigo-400/30 shadow-inner ai-response max-h-48"></div>
+                        
+                        <!-- Doubt History Log -->
+                        <div class="flex-1 bg-black/20 rounded-xl p-3 overflow-hidden flex flex-col border border-white/5" id="doubt-history-container">
+                            <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-1">
+                                <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest">📜 INTEL LOG (DOUBT HISTORY)</span>
+                                <button onclick="clearDoubts()" class="text-[10px] text-red-300 hover:text-red-100">CLEAR</button>
+                            </div>
+                            <div id="doubt-history-list" class="overflow-y-auto custom-scroll space-y-2 text-xs text-indigo-100 flex-1">
+                                <div class="italic opacity-50 text-center mt-4">No tactical intel logged yet.</div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 mt-4 pt-2 border-t border-white/10">
+                            <input type="text" id="ai-concept-query" placeholder="Ask doubt..." class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm text-white focus:outline-none placeholder-indigo-300 focus:bg-white/20 transition-all">
+                            <button onclick="askExaminer()" class="bg-white text-pro-primary px-6 py-2 rounded-xl font-bold text-sm hover:bg-indigo-50 shadow-lg transition-transform active:scale-95">QUERY</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PLANNER & POMODORO -->
+        <section id="view-planner" class="hidden space-y-6">
+            <header class="mb-4">
+                <h2 class="text-2xl font-bold text-slate-800">Routine Generator</h2>
+                <p class="text-sm text-slate-500">Realistic 90/15 Rhythm with Meal Breaks.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Control Panel -->
+                <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
+                    <h3 class="font-bold text-pro-primary mb-4">⏱️ Focus Timer</h3>
+                    <div class="text-center mb-6">
+                        <div class="text-6xl font-mono font-bold text-slate-800 tracking-wider mb-2" id="timer-display">90:00</div>
+                        <div class="text-xs text-slate-400 uppercase font-bold" id="timer-status">Deep Work Mode</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="startTimer()" class="flex-1 py-3 bg-pro-success text-white rounded-xl font-bold hover:bg-green-600 shadow-lg">START</button>
+                        <button onclick="resetTimer()" class="px-4 py-3 bg-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-300">RESET</button>
+                    </div>
+                </div>
+
+                <!-- Session Log -->
+                <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100 lg:col-span-2">
+                    <h3 class="font-bold text-slate-700 mb-4">📅 Generate Daily Routine</h3>
+                    <div class="flex gap-4 mb-6 items-end">
+                        <div class="flex-1">
+                            <label class="text-xs font-bold text-slate-400">Start Time</label>
+                            <input type="time" id="plan-start" value="07:00" class="w-full mt-1 p-2 border rounded-lg text-sm">
+                        </div>
+                        <div class="flex-1">
+                            <label class="text-xs font-bold text-slate-400">Total Hours</label>
+                            <select id="plan-hours" class="w-full mt-1 p-2 border rounded-lg text-sm">
+                                <option value="4">4 Hours (Light)</option>
+                                <option value="8">8 Hours (Standard)</option>
+                                <option value="12">12 Hours (Intense)</option>
+                            </select>
+                        </div>
+                        <button onclick="generatePlan()" class="bg-pro-primary text-white px-6 py-2 rounded-lg font-bold text-sm h-10 shadow-md">Create Routine</button>
+                    </div>
+                    <div id="schedule-list" class="space-y-3 max-h-80 overflow-y-auto custom-scroll">
+                        <div class="text-center text-slate-400 text-sm italic py-8">Select hours and generate your strategy.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AUDITOR -->
+        <section id="view-auditor" class="hidden space-y-6">
+            <header class="mb-4">
+                <h2 class="text-2xl font-bold text-slate-800">Strict Answer Auditor</h2>
+                <p class="text-sm text-slate-500">Evaluation based on <strong class="text-pro-primary">ICAI Keywords</strong> & <strong class="text-pro-primary">Weightage</strong>.</p>
+            </header>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-2xl shadow-soft border border-slate-100">
+                        <div class="flex gap-4 mb-4">
+                            <div class="flex-1">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">Question</label>
+                                <input type="text" id="audit-question" placeholder="Topic (e.g., Constructive Notice)" class="w-full p-2 border border-slate-200 rounded-lg text-sm">
+                            </div>
+                            <div class="w-24">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">Weightage</label>
+                                <input type="number" id="audit-marks" placeholder="Marks" class="w-full p-2 border border-slate-200 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <textarea id="audit-text-fallback" class="w-full h-48 p-3 border border-slate-200 rounded-xl text-sm font-mono outline-none resize-none mb-4" placeholder="Type your answer here exactly as you would write in exam..."></textarea>
+                        <div class="flex gap-2">
+                             <select id="audit-strictness" class="p-3 border border-slate-200 rounded-xl text-sm bg-slate-50"><option value="Strict">Strict Mode</option><option value="Lenient">Lenient Mode</option></select>
+                             <button onclick="auditAnswerWithImage()" class="flex-1 py-3 bg-pro-primary text-white rounded-xl font-bold text-sm hover:bg-pro-primary-light shadow-lg">Run Audit</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100 flex flex-col h-full min-h-[400px]">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4 border-b pb-2">Examiner's Remarks</h3>
+                    <div id="audit-result" class="text-sm text-slate-600 space-y-4 flex-1 overflow-y-auto custom-scroll ai-response">
+                        <div class="flex flex-col items-center justify-center h-full text-slate-300 gap-2"><span>Waiting for input...</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ARMORY -->
+        <section id="view-armory" class="hidden space-y-6">
+            <header class="mb-6">
+                <h2 class="text-2xl font-bold text-slate-800">The Armory</h2>
+                <p class="text-sm text-slate-500">Resources, Simulation & Tracking.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- 1. MOCK GENERATOR -->
+                <div class="bg-gradient-to-br from-pro-primary to-slate-900 rounded-2xl p-6 text-white shadow-lg">
+                    <h3 class="font-bold flex items-center gap-2 mb-2 text-pro-warning">
+                        🤖 AI Paper Architect
+                    </h3>
+                    <p class="text-xs text-indigo-200 mb-6">Generate standardized ICAI-style mock papers.</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-indigo-300 uppercase">Subject</label>
+                            <select id="gen-subject" class="w-full mt-1 p-2 rounded-lg bg-white/10 border border-white/20 text-sm outline-none">
+                                <option value="Accounts">Accounting</option>
+                                <option value="Law">Business Laws</option>
+                                <option value="Maths">Quant Aptitude</option>
+                                <option value="Eco">Economics</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-indigo-300 uppercase">Syllabus Coverage</label>
+                            <select id="gen-type" class="w-full mt-1 p-2 rounded-lg bg-white/10 border border-white/20 text-sm outline-none">
+                                <option value="30">Unit Test (30% Syllabus)</option>
+                                <option value="50">Mid-Term (50% Syllabus)</option>
+                                <option value="70">Pre-Final (70% Syllabus)</option>
+                                <option value="100">Full Mock (100% Syllabus)</option>
+                            </select>
+                        </div>
+                        <button onclick="generateMockPaper()" class="w-full py-3 bg-white text-pro-primary font-bold rounded-lg text-sm hover:bg-indigo-50 shadow-lg">GENERATE PAPER</button>
+                    </div>
+                    
+                    <!-- Output Area for Generated Mock -->
+                    <div id="gen-output" class="mt-4 p-3 bg-black/20 rounded-lg text-xs font-mono text-indigo-100 hidden max-h-48 overflow-y-auto custom-scroll"></div>
+                </div>
+
+                <!-- 2. OFFICIAL RESOURCES & LOG SCORE -->
+                <div class="space-y-6 lg:col-span-2">
+                    <!-- Resources -->
+                    <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-pro-primary">🔗 Official Uplinks</h3>
+                            <p class="text-xs text-slate-400">Direct access to BoS Portals.</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="https://boslive.icai.org/" target="_blank" class="px-4 py-2 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-100 text-xs font-bold text-slate-600">Portal ↗</a>
+                            <a href="https://www.icai.org/post/mock-test-papers-foundation" target="_blank" class="px-4 py-2 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-100 text-xs font-bold text-slate-600">MTPs ↗</a>
+                        </div>
+                    </div>
+
+                    <!-- 3. MOCK SCORE LOGGER -->
+                    <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
+                        <h3 class="font-bold text-pro-warning mb-4">📊 Precision Score Logger</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 items-end">
+                            <div class="col-span-1">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">Subject</label>
+                                <select id="score-subject" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                                    <option value="Accounts">Accounting</option>
+                                    <option value="Law">Business Laws</option>
+                                    <option value="Maths">Quant Aptitude</option>
+                                    <option value="Eco">Economics</option>
+                                </select>
+                            </div>
+                            <div class="col-span-1">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">Test Tier</label>
+                                <select id="score-tier" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                                    <option value="30">Unit (30%)</option>
+                                    <option value="50">Mid (50%)</option>
+                                    <option value="70">Pre (70%)</option>
+                                    <option value="100">Full (100%)</option>
+                                </select>
+                            </div>
+                            <div class="col-span-1">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">Score</label>
+                                <div class="flex items-center">
+                                    <input id="score-marks" type="number" class="w-full p-2 border-l border-t border-b rounded-l-lg text-sm" placeholder="Obt">
+                                    <span class="bg-slate-100 p-2 border text-sm text-slate-500 rounded-r-lg">/100</span>
+                                </div>
+                            </div>
+                            <button onclick="addMockScore()" class="py-2 bg-pro-warning text-white font-bold rounded-lg text-xs hover:bg-yellow-600 h-10 shadow-md">LOG</button>
+                        </div>
+                        <div id="score-feedback" class="mt-2 text-xs text-green-600 font-bold hidden">✅ Score Saved. Dashboard Updated.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let apiKey = localStorage.getItem('icai_api_key') || "";
+        let syllabusState = JSON.parse(localStorage.getItem('icai_syllabus_v6pro')) || { accounts: {}, law: {}, math: {}, eco: {} };
+        let mockScores = JSON.parse(localStorage.getItem('icai_mock_scores_v10')) || []; 
+        let doubtHistory = JSON.parse(localStorage.getItem('icai_doubt_history')) || [];
+        let trendChartInstance = null;
+        let radarChartInstance = null;
+        let timerInterval = null;
+        let timerMode = 'pomodoro';
+
+        const chapters = {
+            accounts: ["Theoretical Framework", "Accounting Process", "BRS", "Inventories", "Depreciation", "Bill of Exchange", "Final Accounts", "NPO", "Company A/c", "Partnership"],
+            law: ["Regulatory Framework", "Contract Act", "Sale of Goods", "Partnership Act", "LLP Act", "Companies Act", "Negotiable Inst."],
+            math: ["Ratio/Prop/Indices", "Equations", "Linear Inequalities", "Time Value of Money", "Permutations/Comb", "AP/GP", "Sets/Relations", "Calculus", "Number Series", "Direction Test", "Seating Arr", "Blood Relations", "Statistical Desc", "Central Tendency", "Probability", "Theoretical Dist", "Correlation/Reg", "Index Numbers"],
+            eco: ["Intro to Eco", "Consumer Behaviour", "Supply & Prod", "Price Determination", "Business Cycles", "National Income", "Public Finance", "Money Market", "Int Trade", "Indian Economy"]
+        };
+
+        // NEW: Chapter Weights (Estimated Sessions to Master)
+        const chapterWeights = {
+            accounts: [2, 3, 3, 4, 3, 3, 6, 5, 6, 6], // Total: 41
+            law: [2, 8, 4, 4, 2, 4, 3], // Total: 27
+            math: [3, 3, 1, 6, 4, 3, 2, 5, 2, 1, 2, 2, 2, 4, 5, 4, 3, 2], // Total: 54
+            eco: [2, 4, 4, 4, 2, 5, 3, 3, 3, 3] // Total: 33
+        };
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if(!apiKey) toggleSettings();
+            renderChapters();
+            refreshAnalytics();
+            updateCountdown();
+            renderDoubtHistory();
+        });
+
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            ['dashboard', 'syllabus', 'auditor', 'armory', 'planner'].forEach(id => {
+                document.getElementById(`view-${id}`).classList.add('hidden');
+                document.getElementById(`btn-${id}`).classList.remove('active');
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`btn-${tabId}`).classList.add('active');
+            if(tabId === 'dashboard') refreshAnalytics();
+        }
+        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
+        function saveApiKey() {
+            const key = document.getElementById('api-key-input').value.trim();
+            if(key) { apiKey = key; localStorage.setItem('icai_api_key', key); toggleSettings(); alert("System Activated."); }
+        }
+
+        // --- ANALYTICS (WEIGHTED LOGIC) ---
+        function refreshAnalytics() {
+            let totalChapters = 0, completedChapters = 0, critical = 0;
+            let weightedTotal = 0, weightedDone = 0;
+            const now = new Date();
+
+            Object.keys(chapters).forEach(sub => {
+                totalChapters += chapters[sub].length;
+                const weights = chapterWeights[sub];
+                const subState = syllabusState[sub] || {};
+                
+                // Calculate Weights
+                weights.forEach((w, idx) => {
+                    weightedTotal += w;
+                    if(subState[idx]) weightedDone += w;
+                });
+
+                // Standard Counts
+                const keys = Object.keys(subState);
+                completedChapters += keys.length;
+                keys.forEach(idx => { if (Math.floor((now - new Date(subState[idx])) / 86400000) > 7) critical++; });
+            });
+
+            // Syllabus % based on WEIGHT
+            const syllabusPct = Math.round((weightedDone/weightedTotal)*100) || 0;
+            document.getElementById('dash-syllabus-pct').innerText = `${syllabusPct}%`;
+            document.getElementById('dash-critical-revs').innerText = critical;
+            document.getElementById('dash-tests-count').innerText = mockScores.length;
+
+            const fullMocks = mockScores.filter(s => s.tier === 100);
+            const partMocks = mockScores.filter(s => s.tier < 100);
+            const fullAvg = fullMocks.length ? Math.round(fullMocks.reduce((a,b)=>a+b.pct,0)/fullMocks.length) : 0;
+            const partAvg = partMocks.length ? Math.round(partMocks.reduce((a,b)=>a+b.pct,0)/partMocks.length) : 0;
+            
+            document.getElementById('dash-full-avg').innerText = fullMocks.length ? `${fullAvg}%` : "--";
+            document.getElementById('dash-part-avg').innerText = partMocks.length ? `${partAvg}%` : "--";
+
+            // SESSIONS TO MASTERY (WEIGHTED)
+            // Iterate all chapters, if not done, sum their specific weights
+            let sessionsForSyllabus = 0;
+            Object.keys(chapters).forEach(sub => {
+                const subState = syllabusState[sub] || {};
+                chapterWeights[sub].forEach((w, idx) => {
+                    if(!subState[idx]) sessionsForSyllabus += w;
+                });
+            });
+
+            // Score Gap
+            const currentAvg = fullMocks.length ? fullAvg : partAvg;
+            let sessionsForScore = 0;
+            if (currentAvg < 75) {
+                sessionsForScore = Math.ceil((75 - currentAvg) / 2);
+            }
+            
+            const totalSessionsNeeded = sessionsForSyllabus + sessionsForScore;
+            document.getElementById('dash-sessions-needed').innerText = totalSessionsNeeded;
+
+            // Competency
+            let scoreMetric = fullMocks.length ? fullAvg : (partAvg * 0.8);
+            let competency = (syllabusPct * 0.6) + (scoreMetric * 0.4);
+            if(critical > 5) competency -= 5;
+            
+            const rBadge = document.getElementById('readiness-badge');
+            document.getElementById('competency-val').innerText = `${Math.round(competency)}%`;
+            rBadge.innerText = `LEVEL: ${Math.round(competency)}`;
+            rBadge.className = competency > 70 ? "text-[10px] bg-pro-success text-white px-2 py-0.5 rounded font-mono font-bold" : (competency > 40 ? "text-[10px] bg-pro-warning text-white px-2 py-0.5 rounded font-mono font-bold" : "text-[10px] bg-pro-danger text-white px-2 py-0.5 rounded font-mono font-bold");
+
+            renderCharts();
+        }
+
+        // --- CHARTS, SYLLABUS, AUDITOR, EXAMINER, ROUTINE, MOCK GEN ---
+        // (Identical to v10.5, ensuring no feature loss)
+        function renderCharts() {
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            const recent = mockScores.slice(-10);
+            const data = recent.map(s => s.pct);
+            const labels = recent.map((s, i) => `T${i+1} (${s.tier}%)`);
+            if(trendChartInstance) trendChartInstance.destroy();
+            trendChartInstance = new Chart(ctxTrend, { type: 'line', data: { labels, datasets: [{ label: 'Score %', data, borderColor: '#3730a3', backgroundColor: 'rgba(55, 48, 163, 0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } } });
+            
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            const subs = ["Accounts", "Law", "Maths", "Eco"];
+            const rData = subs.map(s => {
+                const subScores = mockScores.filter(m => m.subject === s);
+                return subScores.length ? Math.round(subScores.reduce((a,b)=>a+b.pct,0)/subScores.length) : 0;
+            });
+            if(radarChartInstance) radarChartInstance.destroy();
+            radarChartInstance = new Chart(ctxRadar, { type: 'radar', data: { labels: subs, datasets: [{ label: 'Strength', data: rData, backgroundColor: 'rgba(13, 148, 136, 0.2)', borderColor: '#0d9488' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100 } } } });
+        }
+
+        function renderChapters() {
+            const subject = document.getElementById('subject-selector').value;
+            const container = document.getElementById('chapter-list');
+            const state = syllabusState[subject] || {};
+            // Display Weight in UI
+            const weights = chapterWeights[subject];
+            
+            container.innerHTML = chapters[subject].map((chap, idx) => {
+                const dateStr = state[idx];
+                const weight = weights[idx];
+                let statusClass = "bg-slate-200", statusText = "Not Started";
+                if (dateStr) { const days = Math.floor((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24)); if (days < 3) { statusClass = "status-green"; statusText = "Fresh"; } else if (days < 7) { statusClass = "status-yellow"; statusText = "Review"; } else { statusClass = "status-red"; statusText = "Decay"; } }
+                return `<div onclick="toggleChapter('${subject}', ${idx})" class="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl cursor-pointer hover:border-pro-primary transition-colors group">
+                    <div>
+                        <span class="text-sm font-medium ${dateStr ? 'text-slate-700' : 'text-slate-400'}">${chap}</span>
+                        <span class="text-[9px] text-indigo-300 ml-2 bg-indigo-50 px-1 rounded">Est: ${weight} Sess</span>
+                    </div>
+                    <div class="flex items-center gap-2"><span class="text-[10px] text-slate-400 font-mono">${statusText}</span><span class="status-dot ${dateStr ? statusClass : 'bg-slate-200'}"></span></div></div>`;
+            }).join('');
+            refreshAnalytics();
+        }
+        function toggleChapter(sub, idx) { if (!syllabusState[sub]) syllabusState[sub] = {}; syllabusState[sub][idx] = new Date().toISOString(); localStorage.setItem('icai_syllabus_v6pro', JSON.stringify(syllabusState)); renderChapters(); }
+
+        async function askExaminer() {
+            const q = document.getElementById('ai-concept-query').value;
+            const out = document.getElementById('ai-concept-output');
+            if(!q || !apiKey) return alert("API Key Needed");
+            out.classList.remove('hidden'); document.getElementById('doubt-history-container').classList.add('hidden');
+            out.innerHTML = `<div class="flex items-center gap-2"><div class="loader"></div> <span>Searching ICAI Database...</span></div>`;
+            const sys = `You are the Chief Examiner for ICAI CA Foundation. Domain: Accounting, Business Laws, Maths/Stats/LR, Economics. RULES: 1. Answer using strict technical/legal terminology. 2. IF question is unrelated to these 4 subjects (e.g. movies, coding), REPLY ONLY: '⚠️ DISTRACTION DETECTED. Penalty Applied.'`;
+            try {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: q }] }], systemInstruction: { parts: [{ text: sys }] } }) });
+                const data = await resp.json();
+                const ans = data.candidates[0].content.parts[0].text;
+                out.innerHTML = ans.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                if(!ans.includes("DISTRACTION")) { doubtHistory.unshift({ q: q, a: ans.substring(0, 80) + "..." }); localStorage.setItem('icai_doubt_history', JSON.stringify(doubtHistory)); renderDoubtHistory(); }
+                document.getElementById('doubt-history-container').classList.remove('hidden');
+            } catch(e) { out.innerHTML = "Error."; }
+        }
+        function renderDoubtHistory() { const list = document.getElementById('doubt-history-list'); if(doubtHistory.length === 0) return; list.innerHTML = doubtHistory.map(i => `<div class="p-2 bg-white/10 rounded mb-2 border border-white/5 cursor-pointer hover:bg-white/20" onclick="alert('${i.q}')"><div class="font-bold text-indigo-200 truncate">Q: ${i.q}</div><div class="text-[10px] text-indigo-400 truncate">${i.a}</div></div>`).join(''); }
+        function clearDoubts() { doubtHistory = []; localStorage.removeItem('icai_doubt_history'); renderDoubtHistory(); }
+
+        function generatePlan() {
+            const start = document.getElementById('plan-start').value;
+            const hours = parseInt(document.getElementById('plan-hours').value);
+            const list = document.getElementById('schedule-list');
+            let time = new Date(`2000-01-01T${start}`);
+            let html = '';
+            const blocks = Math.floor(hours / 1.5);
+            for(let i=1; i<=blocks; i++) {
+                let sStr = time.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                time.setMinutes(time.getMinutes() + 90);
+                let eStr = time.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                html += `<div class="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-lg shadow-sm"><div class="w-20 text-center"><div class="text-xs text-slate-400 font-bold">${sStr}</div><div class="text-[10px] text-slate-300">to ${eStr}</div></div><div class="flex-1 border-l pl-3 border-slate-100"><div class="text-sm font-bold text-pro-primary">Deep Work Session ${i}</div><div class="text-[10px] text-slate-400">Single Task Focus</div></div><div class="text-xs font-mono font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">90m</div></div>`;
+                if(i < blocks) {
+                    if(i % 3 === 0) { time.setMinutes(time.getMinutes() + 60); html += `<div class="flex items-center justify-center my-2 gap-2 text-xs font-bold text-pro-warning bg-orange-50 p-2 rounded border border-orange-100"><span>🍽️ Long Break / Meal</span><span>(60m)</span></div>`; }
+                    else { time.setMinutes(time.getMinutes() + 15); html += `<div class="flex items-center justify-center my-2 gap-2 text-xs font-bold text-pro-success bg-green-50 p-2 rounded border border-green-100"><span>🌱 Recharge</span><span>(15m)</span></div>`; }
+                }
+            }
+            list.innerHTML = html;
+        }
+
+        async function generateMockPaper() {
+            const subject = document.getElementById('gen-subject').value;
+            const tier = document.getElementById('gen-type').value;
+            const out = document.getElementById('gen-output');
+            if(!apiKey) return alert("API Key Needed");
+            out.classList.remove('hidden'); out.innerHTML = `<div class="flex items-center gap-2"><div class="loader"></div> <span>Designing ${tier}% Syllabus Paper...</span></div>`;
+            const sys = `You are the ICAI Board of Studies. Generate a Mock Test Paper for CA Foundation Subject: ${subject}. Type: ${tier}% Syllabus Coverage. Format: 5 Questions (Mix of Theory/Practical/MCQ). Strict ICAI Standard. Show Answers at the end.`;
+            try {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: "Generate Paper" }] }], systemInstruction: { parts: [{ text: sys }] } }) });
+                const data = await resp.json();
+                out.innerHTML = data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            } catch(e) { out.innerHTML = "Error generating paper."; }
+        }
+
+        async function auditAnswerWithImage() {
+            const q = document.getElementById('audit-question').value;
+            const marks = document.getElementById('audit-marks').value;
+            const txt = document.getElementById('audit-text-fallback').value;
+            const strict = document.getElementById('audit-strictness').value;
+            const out = document.getElementById('audit-result');
+            if(!apiKey) return alert("API Key Needed");
+            out.innerHTML = "Evaluating...";
+            const sys = `ICAI Examiner. Strictness: ${strict}. Context: ${marks} Marks. Check Keywords, Sections, Length. Output HTML.`;
+            try {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: `Q: ${q} (${marks} marks). A: ${txt}` }] }], systemInstruction: { parts: [{ text: sys }] } }) });
+                const data = await resp.json();
+                out.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+            } catch(e) { out.innerHTML = "Error."; }
+        }
+
+        function addMockScore() {
+            const sub = document.getElementById('score-subject').value;
+            const tier = document.getElementById('score-tier').value;
+            const m = document.getElementById('score-marks').value;
+            if(sub && tier && m) {
+                mockScores.push({ subject: sub, tier: parseInt(tier), pct: parseInt(m) });
+                localStorage.setItem('icai_mock_scores_v10', JSON.stringify(mockScores));
+                const fb = document.getElementById('score-feedback');
+                fb.classList.remove('hidden'); setTimeout(() => fb.classList.add('hidden'), 3000);
+                refreshAnalytics();
+            } else alert("Please fill all fields.");
+        }
+
+        function showKeywords() {
+            const chap = document.getElementById('law-chapter-select').value;
+            const d = document.getElementById('keyword-display');
+            if (chap && lawKeywords[chap]) { d.classList.remove('hidden'); d.innerHTML = `<strong>Keywords:</strong><ul class="list-disc pl-4 mt-2">` + lawKeywords[chap].map(k => `<li>${k}</li>`).join('') + `</ul>`; } else d.classList.add('hidden');
+        }
+
+        function startTimer() {
+            if(timerInterval) return;
+            const display = document.getElementById('timer-display');
+            let [m, s] = display.innerText.split(':').map(Number);
+            let time = m * 60 + s;
+            document.getElementById('timer-status').innerText = "Focus Active";
+            timerInterval = setInterval(() => { time--; const min = Math.floor(time / 60); const sec = time % 60; display.innerText = `${min}:${sec < 10 ? '0'+sec : sec}`; if(time <= 0) { clearInterval(timerInterval); timerInterval = null; alert("Session Done!"); } }, 1000);
+        }
+        function resetTimer() { clearInterval(timerInterval); timerInterval = null; document.getElementById('timer-display').innerText = timerMode === 'pomodoro' ? "25:00" : "90:00"; }
+        function setTimerMode(mode) { 
+            timerMode = mode; 
+            document.getElementById('timer-display').innerText = mode === 'pomodoro' ? "25:00" : "90:00"; 
+            document.getElementById('btn-mode-pom').className = mode === 'pomodoro' ? "flex-1 py-2 rounded-lg text-xs font-bold border border-slate-200 transition-colors bg-pro-primary text-white" : "flex-1 py-2 rounded-lg text-xs font-bold border border-slate-200 transition-colors text-slate-600 hover:bg-slate-50";
+            document.getElementById('btn-mode-deep').className = mode === 'deep' ? "flex-1 py-2 rounded-lg text-xs font-bold border border-slate-200 transition-colors bg-pro-primary text-white" : "flex-1 py-2 rounded-lg text-xs font-bold border border-slate-200 transition-colors text-slate-600 hover:bg-slate-50";
+            resetTimer(); 
+        }
+
+        function updateCountdown() { document.getElementById('days-count').innerText = Math.max(0, Math.ceil((new Date('2026-01-15') - new Date()) / 86400000)); }
+
+    </script>
+</body>
+</html>
