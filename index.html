@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ICAI FOUNDATION COMMAND vFINAL - JAN 2026</title>
+    <title>ICAI FOUNDATION COMMAND v26.0 - JAN 2026</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,7 +17,7 @@
             theme: {
                 extend: {
                     colors: {
-                        'glass-bg': 'rgba(17, 25, 40, 0.85)',
+                        'glass-bg': 'rgba(17, 25, 40, 0.9)',
                         'glass-border': 'rgba(255, 255, 255, 0.08)',
                         'pro-primary': '#4f46e5',
                         'pro-accent': '#0d9488',
@@ -30,12 +30,14 @@
                     },
                     animation: {
                         'float': 'float 8s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'sound-wave': 'sound 0.8s ease-in-out infinite alternate',
                     },
                     keyframes: {
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-15px)' } },
-                        slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+                        slideUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        sound: { '0%': { height: '20%' }, '100%': { height: '100%' } }
                     }
                 }
             }
@@ -46,190 +48,165 @@
     <style>
         body { background-color: #020617; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow: hidden; }
         
-        /* Premium Background */
-        .bg-gradient-orb { position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.3; }
-        .orb-1 { top: -20%; left: -10%; width: 60vw; height: 60vw; background: #3730a3; animation: float 10s infinite; }
-        .orb-2 { bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: #115e59; animation: float 12s infinite reverse; }
+        .bg-gradient-orb { position: fixed; border-radius: 50%; filter: blur(120px); z-index: -1; opacity: 0.2; pointer-events: none; }
+        .orb-1 { top: -20%; left: -10%; width: 70vw; height: 70vw; background: #4338ca; animation: float 15s infinite; }
+        .orb-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: #0f766e; animation: float 18s infinite reverse; }
 
-        /* Glassmorphism */
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-        
         .glass-card {
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.4));
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.6));
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            transition: transform 0.2s, border-color 0.2s;
         }
-        .glass-card:hover { transform: translateY(-2px); border-color: rgba(99, 102, 241, 0.3); box-shadow: 0 10px 30px -10px rgba(79, 70, 229, 0.2); }
-
-        /* Navigation */
-        .nav-btn { transition: all 0.3s; border-radius: 12px; margin-bottom: 4px; border-left: 3px solid transparent; }
-        .nav-btn:hover { background: rgba(255,255,255,0.05); }
-        .nav-btn.active { background: linear-gradient(90deg, rgba(79, 70, 229, 0.15), transparent); border-left-color: #6366f1; color: white; text-shadow: 0 0 15px rgba(99, 102, 241, 0.5); }
-
-        /* Custom Scroll */
-        .custom-scroll::-webkit-scrollbar { width: 5px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-        /* Directives */
-        .directive-card { border-left: 4px solid; padding-left: 1rem; }
-        .directive-urgent { border-color: #ef4444; background: linear-gradient(90deg, rgba(239, 68, 68, 0.1), transparent); }
-        .directive-normal { border-color: #0d9488; background: linear-gradient(90deg, rgba(13, 148, 136, 0.1), transparent); }
-
+        .glass-card:hover { border-color: rgba(99, 102, 241, 0.3); }
+        .nav-btn.active { background: rgba(99, 102, 241, 0.15); border-left: 3px solid #6366f1; color: white; }
+        
         /* Paper Styles */
-        #paper-content { background: white; color: #1e293b; font-size: 1.05rem; line-height: 1.7; }
-        #paper-content h1 { text-align: center; font-weight: 900; margin-bottom: 1rem; color: #0f172a; border-bottom: 2px solid #0f172a; }
-        #paper-content h3 { font-weight: 700; margin-top: 2rem; color: #1e293b; }
-        #paper-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
-        #paper-content th, #paper-content td { border: 1px solid #cbd5e1; padding: 8px; }
+        #paper-content { background: white; color: #1e293b; font-size: 1rem; line-height: 1.6; }
+        #paper-content h1 { text-align: center; font-weight: 900; font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 2px solid #0f172a; }
+        #paper-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        #paper-content th, #paper-content td { border: 1px solid #94a3b8; padding: 8px; }
+        .solution-section { border-top: 2px dashed #cbd5e1; margin-top: 2rem; padding-top: 2rem; background-color: #f0fdf4; border-radius: 8px; padding: 20px; }
+
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        .ai-response strong { color: #818cf8; } 
+
+        /* Audio Viz */
+        .bar { width: 4px; background: #a855f7; border-radius: 2px; animation: sound-wave 0.5s ease-in-out infinite alternate; }
+        .bar:nth-child(odd) { animation-duration: 0.4s; }
     </style>
 </head>
-<body class="text-slate-300">
+<body class="text-slate-300 h-screen flex flex-col md:flex-row">
 
     <div class="bg-gradient-orb orb-1"></div>
     <div class="bg-gradient-orb orb-2"></div>
 
     <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 bg-black/80 z-[60] hidden flex items-center justify-center backdrop-blur-md p-4 animate-slide-up">
-        <div class="glass-panel rounded-2xl p-8 w-full max-w-md">
-            <h3 class="text-xl font-bold text-white mb-2 tracking-tight">⚙️ SYSTEM INITIALIZATION</h3>
-            <p class="text-sm text-slate-400 mb-6">Secure Connection to AI Examiner Required.</p>
-            <div class="space-y-4">
-                <input type="password" id="api-key-input" placeholder="Paste Gemini API Key" class="w-full p-4 bg-black/40 border border-white/10 rounded-xl focus:border-indigo-500 outline-none font-mono text-sm text-white transition-all">
-                <button onclick="saveApiKey()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 transition-all">ESTABLISH UPLINK</button>
-                <button onclick="toggleSettings()" class="w-full py-2 text-xs text-slate-500 hover:text-slate-300">CLOSE TERMINAL</button>
-            </div>
+        <div class="glass-card rounded-2xl p-8 w-full max-w-md border border-white/10">
+            <h3 class="text-xl font-bold text-white mb-2">⚙️ SYSTEM CONFIG</h3>
+            <p class="text-sm text-slate-400 mb-6">Enter Gemini API Key for AI features.</p>
+            <input type="password" id="api-key-input" placeholder="Paste API Key" class="w-full p-3 bg-black/50 border border-white/10 rounded-xl focus:border-indigo-500 outline-none font-mono text-sm text-white mb-4">
+            <button onclick="saveApiKey()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition-all">CONNECT</button>
+            <button onclick="toggleSettings()" class="w-full py-3 text-xs text-slate-500 hover:text-slate-300 mt-2">CLOSE</button>
         </div>
     </div>
 
     <!-- EXAM PAPER MODAL -->
-    <div id="paper-modal" class="fixed inset-0 bg-black/90 z-[70] hidden flex flex-col items-center justify-center backdrop-blur-xl p-0 md:p-6 animate-slide-up">
-        <div class="bg-white w-full max-w-5xl h-full md:h-[95vh] md:rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-            <div class="bg-slate-50 border-b border-slate-200 p-4 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="bg-indigo-700 text-white p-2 rounded-lg font-bold shadow-sm">ICAI</div>
-                    <div>
-                        <h3 class="font-bold text-slate-800 text-sm md:text-lg">Simulated Examination</h3>
-                        <p class="text-[10px] md:text-xs text-slate-500 font-mono uppercase tracking-wider">Strict Protocol • <span id="paper-subject-display">Subject</span></p>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="toggleSolutions()" id="btn-reveal-solutions" class="px-4 py-2 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold hover:bg-emerald-200 transition-colors hidden">Reveal Key</button>
-                    <button onclick="printPaper()" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors">Print PDF</button>
-                    <button onclick="closePaperModal()" class="p-2 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors">✕</button>
+    <div id="paper-modal" class="fixed inset-0 bg-black/95 z-[70] hidden flex flex-col animate-slide-up">
+        <div class="bg-slate-900 border-b border-white/10 p-4 flex justify-between items-center shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg font-bold">ICAI</div>
+                <div>
+                    <h3 class="font-bold text-white text-lg" id="modal-title">Mock Simulation</h3>
+                    <p class="text-xs text-slate-400 font-mono uppercase"><span id="paper-subject-display">Subject</span></p>
                 </div>
             </div>
-            <div id="paper-content" class="flex-1 overflow-y-auto custom-scroll p-8 md:p-16 paper-content relative">
-                <div class="flex flex-col items-center justify-center h-full text-slate-400 gap-4">
-                    <div class="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-                    <p class="animate-pulse font-mono text-sm">ARCHITECTING PAPER STRUCTURE...</p>
-                </div>
+            <div class="flex gap-2">
+                <button onclick="transferToAuditor()" id="btn-transfer-audit" class="px-4 py-2 bg-indigo-600 text-white border border-indigo-500 rounded-lg text-xs font-bold hover:bg-indigo-500 transition-colors flex items-center gap-2">
+                    <span>📝</span> Submit for Evaluation
+                </button>
+                <button onclick="toggleSolutions()" id="btn-reveal-solutions" class="px-4 py-2 bg-emerald-600/20 text-emerald-400 border border-emerald-600/50 rounded-lg text-xs font-bold hover:bg-emerald-600/30 hidden">Reveal Key</button>
+                <button onclick="printPaper()" class="px-4 py-2 bg-white text-slate-900 rounded-lg text-xs font-bold hover:bg-slate-200">Print PDF</button>
+                <button onclick="closePaperModal()" class="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg">✕</button>
+            </div>
+        </div>
+        <div id="paper-content" class="flex-1 overflow-y-auto custom-scroll p-8 md:p-16 max-w-5xl mx-auto w-full shadow-2xl">
+            <div class="flex flex-col items-center justify-center h-full text-slate-400 gap-4">
+                <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                <p class="font-mono text-sm">GENERATING PAPER...</p>
             </div>
         </div>
     </div>
 
     <!-- MOBILE HEADER -->
-    <div class="md:hidden glass-panel p-4 flex justify-between items-center z-20 sticky top-0 border-b border-white/5">
+    <div class="md:hidden glass-card p-4 flex justify-between items-center z-20 border-b border-white/5 shrink-0">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white text-xs shadow-lg shadow-indigo-600/40">CA</div>
-            <h1 class="text-sm font-extrabold tracking-wide text-white">COMMAND CENTER</h1>
+            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white text-xs">CA</div>
+            <h1 class="text-sm font-extrabold tracking-wide text-white">COMMAND CENTRE</h1>
         </div>
         <button onclick="toggleSidebar()" class="p-2 text-white hover:bg-white/10 rounded-lg"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
     </div>
 
     <!-- SIDEBAR -->
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/80 z-30 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
-    <nav id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 glass-panel border-r-0 md:border-r border-white/5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-out flex flex-col h-full shadow-2xl md:shadow-none">
+    <nav id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 glass-card border-r-0 md:border-r border-white/5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-out flex flex-col h-full shrink-0">
         <div class="p-6 border-b border-white/5 hidden md:block">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-600/40">CA</div>
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">CA</div>
                 <div>
-                    <h1 class="text-sm font-extrabold tracking-wide text-white">COMMAND vFinal</h1>
-                    <p class="text-[10px] text-indigo-300 uppercase tracking-widest font-mono">Jan '26 Operation</p>
+                    <h1 class="text-sm font-extrabold tracking-wide text-white">COMMAND v26.0</h1>
+                    <p class="text-[9px] text-indigo-300 uppercase tracking-widest font-mono">Jan '26 Target</p>
                 </div>
             </div>
         </div>
         
-        <div class="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scroll">
-            <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn active w-full text-left px-4 py-3.5 text-sm font-medium text-slate-300">📊 Strategic HQ</button>
-            <button onclick="switchTab('syllabus')" id="btn-syllabus" class="nav-btn w-full text-left px-4 py-3.5 text-sm font-medium text-slate-300">🧠 Retention Radar</button>
-            <button onclick="switchTab('planner')" id="btn-planner" class="nav-btn w-full text-left px-4 py-3.5 text-sm font-medium text-slate-300">🍅 Routine & Timer</button>
-            <button onclick="switchTab('auditor')" id="btn-auditor" class="nav-btn w-full text-left px-4 py-3.5 text-sm font-medium text-slate-300">📸 Answer Auditor</button>
-            <button onclick="switchTab('armory')" id="btn-armory" class="nav-btn w-full text-left px-4 py-3.5 text-sm font-medium text-slate-300">🗄️ The Armory</button>
+        <div class="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scroll">
+            <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn active w-full text-left px-4 py-3 text-sm font-medium text-slate-300 rounded-lg hover:bg-white/5">📊 Mission Dashboard</button>
+            <button onclick="switchTab('syllabus')" id="btn-syllabus" class="nav-btn w-full text-left px-4 py-3 text-sm font-medium text-slate-300 rounded-lg hover:bg-white/5">🧠 Syllabus & AI</button>
+            <button onclick="switchTab('planner')" id="btn-planner" class="nav-btn w-full text-left px-4 py-3 text-sm font-medium text-slate-300 rounded-lg hover:bg-white/5">🍅 Routine Gen</button>
+            <button onclick="switchTab('auditor')" id="btn-auditor" class="nav-btn w-full text-left px-4 py-3 text-sm font-medium text-slate-300 rounded-lg hover:bg-white/5">📸 Answer Auditor</button>
+            <button onclick="switchTab('armory')" id="btn-armory" class="nav-btn w-full text-left px-4 py-3 text-sm font-medium text-slate-300 rounded-lg hover:bg-white/5">🗄️ The Armory</button>
         </div>
         
         <div class="p-4 border-t border-white/5 bg-black/20">
             <div class="flex items-center justify-between mb-3 px-1">
                 <span class="text-[10px] font-bold text-slate-500 tracking-wider">COMPETENCY</span>
-                <span id="readiness-badge" class="text-[10px] bg-white/5 text-white px-2 py-0.5 rounded border border-white/10 font-mono">CALC...</span>
+                <span id="readiness-badge" class="text-[10px] bg-white/5 text-white px-2 py-0.5 rounded border border-white/10 font-mono">--%</span>
             </div>
-            <button onclick="toggleSettings()" class="w-full py-2.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all">⚙️ SYSTEM CONFIG</button>
+            <button onclick="toggleSettings()" class="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all">⚙️ CONFIG</button>
         </div>
     </nav>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 overflow-y-auto p-4 md:p-8 relative custom-scroll w-full">
+    <main class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 relative custom-scroll w-full h-full">
         
-        <!-- DASHBOARD (WAR ROOM) -->
-        <section id="view-dashboard" class="space-y-6 animate-slide-up pb-20 md:pb-0">
-            
-            <!-- Restored Header with Days Left -->
-            <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <!-- DASHBOARD -->
+        <section id="view-dashboard" class="space-y-6 animate-slide-up max-w-7xl mx-auto pb-20 md:pb-0">
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-4">
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Mission Status</h2>
-                    <p class="text-sm text-slate-400 mt-1">Target: <span class="text-emerald-400 font-bold">Jan 2026</span> • Competency: <span id="competency-val" class="font-bold text-indigo-400">--%</span></p>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">Mission Control</h2>
+                    <p class="text-sm text-slate-400">Target: <span class="text-emerald-400 font-bold">Jan 2026</span></p>
                 </div>
-                <div class="glass-card px-6 py-3 rounded-2xl text-right border-l-4 border-indigo-500 w-full md:w-auto">
-                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Days Left</div>
-                    <div class="text-3xl font-mono font-bold text-white" id="days-count">000</div>
+                <div class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-right">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase">Days Remaining</div>
+                    <div class="text-2xl font-mono font-bold text-white" id="days-count">000</div>
                 </div>
             </header>
 
-            <!-- DAILY DIRECTIVE (New Feature) -->
-            <div id="daily-directive-panel" class="glass-card p-6 rounded-3xl border-l-4 border-indigo-500 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-6 opacity-5"><svg class="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/></svg></div>
-                <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-                    DAILY BATTLE PLAN
+            <div id="daily-directive-panel" class="glass-card p-5 rounded-2xl border-l-4 border-indigo-500">
+                <h2 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span> COMMANDER'S ORDER
                 </h2>
-                <div id="directive-text" class="text-sm text-slate-300 leading-relaxed max-w-2xl relative z-10">
-                    Initializing Strategic Intervention System... Analyzing weaknesses...
-                </div>
+                <div id="directive-text" class="text-sm text-slate-300 leading-relaxed">Initializing Tactical Analysis...</div>
             </div>
 
-            <!-- Stats -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="glass-card p-5 rounded-2xl">
-                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Syllabus</div>
+                    <div class="text-[10px] text-slate-400 font-bold uppercase">Syllabus</div>
                     <div class="text-3xl font-bold text-white mt-1" id="dash-syllabus-pct">0%</div>
-                    <div class="h-1 w-full bg-slate-700/50 mt-3 rounded-full overflow-hidden"><div id="bar-syllabus" class="h-full bg-indigo-500 w-0 transition-all duration-1000"></div></div>
+                    <div class="h-1 w-full bg-slate-700/30 mt-3 rounded-full overflow-hidden"><div id="bar-syllabus" class="h-full bg-indigo-500 w-0 transition-all duration-1000"></div></div>
                 </div>
                 <div class="glass-card p-5 rounded-2xl">
-                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Time to Mastery</div>
+                    <div class="text-[10px] text-slate-400 font-bold uppercase">Mastery Cost</div>
                     <div class="text-3xl font-bold text-white mt-1" id="dash-sessions-needed">0</div>
-                    <div class="text-[10px] text-indigo-300 mt-1">Sessions Required</div>
+                    <div class="text-[10px] text-indigo-400 mt-1">Sessions Required</div>
                 </div>
                 <div class="glass-card p-5 rounded-2xl border border-red-500/20">
-                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Critical Decay</div>
+                    <div class="text-[10px] text-slate-400 font-bold uppercase">Critical Decay</div>
                     <div class="text-3xl font-bold text-rose-500 mt-1" id="dash-critical-revs">0</div>
                     <div class="text-[10px] text-slate-500 mt-1">Chapters neglected > 7d</div>
                 </div>
                 <div class="glass-card p-5 rounded-2xl">
                     <div class="flex justify-between items-end h-full">
                         <div>
-                            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Mock Avg</div>
+                            <div class="text-[10px] text-slate-400 font-bold uppercase">Mock Avg</div>
                             <div class="text-2xl font-bold text-emerald-400 mt-1" id="dash-full-avg">--</div>
                         </div>
-                        <!-- Restored Part Test Avg here -->
                         <div class="text-center">
-                            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Part Test</div>
+                            <div class="text-[10px] text-slate-400 font-bold uppercase">Part Test</div>
                             <div class="text-xl font-bold text-indigo-400 mt-1" id="dash-part-avg">--</div>
                         </div>
                         <div class="text-right">
@@ -243,84 +220,93 @@
             <!-- Charts -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="glass-card p-6 rounded-2xl lg:col-span-2">
-                    <h3 class="font-bold text-slate-300 mb-4 text-xs uppercase tracking-widest">Performance Trajectory</h3>
+                    <h3 class="font-bold text-slate-300 mb-4 text-xs uppercase">Performance Trend</h3>
                     <div class="h-64 w-full"><canvas id="trendChart"></canvas></div>
                 </div>
                 <div class="glass-card p-6 rounded-2xl">
-                    <h3 class="font-bold text-slate-300 mb-4 text-xs uppercase tracking-widest">Subject Balance</h3>
+                    <h3 class="font-bold text-slate-300 mb-4 text-xs uppercase">Subject Balance</h3>
                     <div class="h-64 w-full"><canvas id="radarChart"></canvas></div>
                 </div>
             </div>
         </section>
 
         <!-- SYLLABUS -->
-        <section id="view-syllabus" class="hidden space-y-6 pb-20 md:pb-0 animate-slide-up">
-            <div class="flex flex-col lg:flex-row gap-6 h-auto lg:h-[calc(100vh-8rem)]">
-                <div class="w-full lg:w-1/2 glass-card rounded-2xl flex flex-col h-[500px] lg:h-auto overflow-hidden">
+        <section id="view-syllabus" class="hidden space-y-6 animate-slide-up max-w-7xl mx-auto pb-20 md:pb-0">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+                <div class="glass-card rounded-2xl flex flex-col h-[600px] overflow-hidden">
                     <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
-                        <h3 class="font-bold text-white">Retention Radar</h3>
+                        <h3 class="font-bold text-white text-sm">Retention Radar</h3>
                         <select id="subject-selector" onchange="renderChapters()" class="text-xs p-2 rounded-lg bg-black/40 border border-white/10 text-white outline-none focus:border-indigo-500">
                             <option value="accounts">Accounting</option>
                             <option value="law">Business Laws</option>
-                            <option value="math">Quant Aptitude</option>
+                            <option value="math">Maths/Stats</option>
                             <option value="eco">Economics</option>
                         </select>
                     </div>
-                    <div class="p-2 bg-black/20 text-[10px] text-center text-slate-400 flex justify-center gap-4 border-b border-white/5">
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Fresh (<3d)</span>
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Review (3-7d)</span>
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span> Decay (>7d)</span>
+                    <div class="p-2 bg-black/20 text-[10px] text-center text-slate-400 flex justify-center gap-4 border-b border-white/5 shrink-0">
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Fresh</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Review</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span> Decay</span>
                     </div>
                     <div id="chapter-list" class="p-4 overflow-y-auto custom-scroll flex-1 space-y-2"></div>
                 </div>
                 
-                <div class="w-full lg:w-1/2 flex flex-col gap-4 h-[500px] lg:h-auto">
-                    <div class="glass-card rounded-2xl p-6 flex flex-col h-full overflow-hidden bg-gradient-to-b from-indigo-900/20 to-transparent">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-bold flex items-center gap-2 text-indigo-400">🎓 Chief Examiner AI</h3>
-                            <div class="text-[9px] border border-indigo-500/30 text-indigo-300 px-2 py-1 rounded">Strict Mode</div>
+                <div class="glass-card rounded-2xl p-5 flex flex-col h-[600px] bg-gradient-to-b from-indigo-900/20 to-transparent">
+                    <div class="flex justify-between items-start mb-2 shrink-0">
+                        <h3 class="font-bold flex items-center gap-2 text-indigo-400 text-sm">🎓 Chief Examiner AI</h3>
+                        <div class="text-[9px] border border-indigo-500/30 text-indigo-300 px-2 py-1 rounded">Strict Mode</div>
+                    </div>
+                    <div id="ai-concept-output" class="bg-black/30 rounded-xl p-4 text-sm text-indigo-100 overflow-y-auto custom-scroll mb-4 hidden border border-white/5 shadow-inner ai-response max-h-48 leading-relaxed"></div>
+                    <div id="doubt-history-container" class="flex-1 bg-black/20 rounded-xl p-3 overflow-hidden flex flex-col border border-white/5 min-h-0">
+                        <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-2 shrink-0">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase">INTEL LOG</span>
+                            <button onclick="clearDoubts()" class="text-[10px] text-rose-400 hover:text-white transition-colors">CLEAR</button>
                         </div>
-                        <p class="text-xs text-indigo-200 mb-4">Accepts: Accounting, Law, Math, Eco.</p>
-                        <div id="ai-concept-output" class="bg-black/30 rounded-xl p-4 text-sm text-indigo-100 overflow-y-auto custom-scroll mb-4 hidden border border-white/5 shadow-inner ai-response max-h-48 leading-relaxed"></div>
-                        <div class="flex-1 bg-black/20 rounded-xl p-3 overflow-hidden flex flex-col border border-white/5">
-                            <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
-                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">INTEL LOG</span>
-                                <button onclick="clearDoubts()" class="text-[10px] text-rose-400 hover:text-white transition-colors">CLEAR</button>
-                            </div>
-                            <div id="doubt-history-list" class="overflow-y-auto custom-scroll space-y-2 text-xs text-slate-400 flex-1"></div>
-                        </div>
-                        <div class="flex gap-2 mt-4 pt-2 border-t border-white/5">
-                            <input type="text" id="ai-concept-query" placeholder="Ask concept or doubt..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:bg-white/10 focus:border-indigo-500/50 transition-all w-full">
-                            <button onclick="askExaminer()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/20 transition-all">ASK</button>
-                        </div>
+                        <div id="doubt-history-list" class="overflow-y-auto custom-scroll space-y-2 text-xs text-slate-400 flex-1"></div>
+                    </div>
+                    <div class="flex gap-2 mt-3 pt-2 border-t border-white/5 shrink-0">
+                        <input type="text" id="ai-concept-query" placeholder="Ask concept..." class="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500/50 w-full">
+                        <button onclick="askExaminer()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-indigo-500">ASK</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- AUDITOR, PLANNER, ARMORY (Standard Placeholders) -->
-        <section id="view-planner" class="hidden space-y-6 pb-20 md:pb-0 animate-slide-up">
-            <header class="mb-4"><h2 class="text-xl font-bold text-white">Routine & Timer</h2></header>
+        <!-- PLANNER -->
+        <section id="view-planner" class="hidden space-y-6 animate-slide-up max-w-7xl mx-auto pb-20 md:pb-0">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="glass-card p-6 rounded-2xl">
                     <h3 class="font-bold text-indigo-400 mb-4">Focus Timer</h3>
-                    <div class="flex gap-2 mb-6"><button onclick="setTimerMode('pomodoro')" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white/5 hover:bg-white/10 text-white border border-white/10">Pomodoro</button><button onclick="setTimerMode('deep')" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white/5 hover:bg-white/10 text-white border border-white/10">Deep Work</button></div>
+                    <div class="flex gap-2 mb-6"><button id="btn-mode-pom" onclick="setTimerMode('pomodoro')" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white/5 text-white border border-white/10">Pomodoro</button><button id="btn-mode-deep" onclick="setTimerMode('deep')" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white/5 text-white border border-white/10">Deep Work</button></div>
                     <div class="text-center mb-6"><div id="timer-display" class="text-5xl font-mono font-bold text-white tracking-widest">25:00</div><div id="timer-status" class="text-xs text-slate-500 uppercase mt-2">Ready</div></div>
-                    <button onclick="startTimer()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-600/20">START SESSION</button>
+                    <button onclick="startTimer()" class="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-500">START</button>
                 </div>
                 <div class="glass-card p-6 rounded-2xl lg:col-span-2">
-                    <h3 class="font-bold text-slate-300 mb-4">Daily Schedule Gen</h3>
-                    <div class="flex gap-4 mb-4"><input type="time" id="plan-start" value="07:00" class="bg-black/30 border border-white/10 rounded-lg p-2 text-white"><select id="plan-hours" class="bg-black/30 border border-white/10 rounded-lg p-2 text-white"><option value="4">4 Hours</option><option value="8">8 Hours</option><option value="12">12 Hours</option></select><button onclick="generatePlan()" class="bg-indigo-600 text-white px-4 rounded-lg text-xs font-bold">GENERATE</button></div>
-                    <div id="schedule-list" class="space-y-2 max-h-64 overflow-y-auto custom-scroll"></div>
+                    <h3 class="font-bold text-slate-300 mb-4">Routine Generator</h3>
+                    <div class="flex gap-3 mb-4"><input type="time" id="plan-start" value="07:00" class="bg-black/30 border border-white/10 rounded-lg p-2 text-white text-sm"><select id="plan-hours" class="bg-black/30 border border-white/10 rounded-lg p-2 text-white text-sm"><option value="4">4 Hours</option><option value="8">8 Hours</option><option value="12">12 Hours</option></select><button onclick="generatePlan()" class="bg-indigo-600 text-white px-4 rounded-lg text-xs font-bold">GENERATE</button></div>
+                    <div id="schedule-list" class="space-y-2 max-h-96 overflow-y-auto custom-scroll">
+                        <div class="text-center text-slate-500 text-xs italic py-12">Select your intensity to generate a psych-optimized schedule.</div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="view-auditor" class="hidden space-y-6 pb-20 md:pb-0 animate-slide-up">
+        <!-- AUDITOR -->
+        <section id="view-auditor" class="hidden space-y-6 animate-slide-up max-w-7xl mx-auto pb-20 md:pb-0">
+            <div class="glass-card p-4 rounded-xl border-l-4 border-indigo-500 mb-4 hidden" id="mock-audit-banner">
+                <div class="text-sm text-white font-bold">📝 Auditing Mock Simulation</div>
+                <div class="text-xs text-slate-400">Questions pre-loaded from AI Architect.</div>
+            </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="glass-card p-6 rounded-2xl space-y-4">
                     <h3 class="font-bold text-indigo-400">Answer Auditor</h3>
-                    <div class="flex gap-2"><input id="audit-question" placeholder="Question Topic..." class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-sm text-white"><input id="audit-marks" type="number" placeholder="Marks" class="w-20 bg-black/30 border border-white/10 rounded-lg p-3 text-sm text-white"></div>
+                    <textarea id="audit-question" placeholder="Paste Question Here..." class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-sm text-white h-24 custom-scroll"></textarea>
+                    
+                    <div class="flex gap-2 items-center">
+                        <input id="audit-marks" type="number" placeholder="Marks" class="w-20 bg-black/30 border border-white/10 rounded-lg p-2 text-sm text-white text-center">
+                        <span class="text-xs text-slate-500">Max Marks</span>
+                    </div>
+                    
                     <div class="border-2 border-dashed border-white/10 rounded-lg p-4 text-center hover:bg-white/5 cursor-pointer relative"><input type="file" onchange="handleImagePreview(this)" class="absolute inset-0 opacity-0 cursor-pointer"><span class="text-xs text-slate-400">📸 Upload Sheet</span></div>
                     <textarea id="audit-text-fallback" class="w-full h-32 bg-black/30 border border-white/10 rounded-lg p-3 text-sm text-white placeholder-slate-600" placeholder="Or type answer..."></textarea>
                     <div class="flex gap-2"><select id="audit-strictness" class="bg-black/30 border border-white/10 rounded-lg p-2 text-white text-xs"><option>Strict</option><option>Lenient</option></select><button onclick="auditAnswerWithImage()" class="flex-1 bg-indigo-600 text-white rounded-lg font-bold text-sm">AUDIT</button></div>
@@ -329,27 +315,47 @@
             </div>
         </section>
 
-        <section id="view-armory" class="hidden space-y-6 pb-20 md:pb-0 animate-slide-up">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="glass-card p-6 rounded-2xl border-t-4 border-amber-500">
+        <!-- ARMORY -->
+        <section id="view-armory" class="hidden space-y-6 animate-slide-up max-w-7xl mx-auto pb-20 md:pb-0">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- AUDIO REVISION POD -->
+                <div class="glass-card p-6 rounded-2xl border-t-4 border-purple-500">
+                    <h3 class="font-bold text-purple-400 mb-4">🎧 Audio Tutor Pod</h3>
+                    <input id="audio-topic" class="w-full p-3 bg-black/30 border border-white/10 rounded-lg text-xs text-white mb-3 outline-none" placeholder="Enter Topic...">
+                    <button onclick="generateAudioRevision()" id="btn-audio-gen" class="w-full py-2 bg-purple-600 text-white font-bold rounded-lg text-xs hover:bg-purple-500 mb-2">GENERATE & PLAY</button>
+                    <div id="audio-viz" class="hidden flex justify-center gap-1 h-4 items-end opacity-80"><div class="bar"></div><div class="bar" style="animation-delay:-0.1s"></div><div class="bar" style="animation-delay:-0.2s"></div><div class="bar"></div></div>
+                    <audio id="audio-player" controls class="w-full mt-2 hidden h-8"></audio>
+                </div>
+
+                <!-- CASE STUDY SOLVER -->
+                <div class="glass-card p-6 rounded-2xl border-t-4 border-blue-500">
+                    <h3 class="font-bold text-blue-400 mb-4">⚖️ Case Study Solver</h3>
+                    <textarea id="case-input" class="w-full h-20 bg-black/30 border border-white/10 rounded-lg p-3 text-xs text-white placeholder-slate-500 mb-3" placeholder="Paste Scenario..."></textarea>
+                    <button onclick="generateCaseSolution()" class="w-full py-2 bg-blue-600 text-white font-bold rounded-lg text-xs hover:bg-blue-500">SOLVE FULL SCREEN</button>
+                </div>
+
+                <!-- MOCK GEN -->
+                <div class="glass-card p-6 rounded-2xl border-t-4 border-amber-500 lg:col-span-2">
                     <h3 class="font-bold text-amber-400 mb-4">🤖 AI Paper Architect</h3>
-                    <div class="space-y-4">
-                        <select id="gen-subject" class="w-full bg-black/30 border border-white/10 p-3 rounded-lg text-white text-sm"><option value="Accounts">Accounting</option><option value="Law">Business Laws</option><option value="Maths">Quant Aptitude</option><option value="Eco">Economics</option></select>
-                        <select id="gen-type" class="w-full bg-black/30 border border-white/10 p-3 rounded-lg text-white text-sm"><option value="30">Unit Test (30%)</option><option value="50">Mid-Term (50%)</option><option value="100">Full Mock</option></select>
-                        <button onclick="generateMockPaper()" class="w-full py-3 bg-white text-black font-bold rounded-lg text-xs hover:bg-slate-200">LAUNCH SIMULATION</button>
+                    <div class="flex gap-4">
+                        <select id="gen-subject" class="flex-1 bg-black/30 border border-white/10 p-3 rounded-lg text-white text-sm"><option value="Accounts">Accounting</option><option value="Law">Business Laws</option><option value="Maths">Quant Aptitude</option><option value="Eco">Economics</option></select>
+                        <select id="gen-type" class="flex-1 bg-black/30 border border-white/10 p-3 rounded-lg text-white text-sm"><option value="30">Unit Test (30%)</option><option value="50">Mid-Term (50%)</option><option value="100">Full Mock</option></select>
+                        <button onclick="generateMockPaper()" class="flex-1 bg-white text-black font-bold rounded-lg text-xs hover:bg-slate-200">LAUNCH SIMULATION</button>
                     </div>
                 </div>
+
                 <div class="lg:col-span-2 space-y-6">
                     <div class="glass-card p-6 rounded-2xl">
-                        <h3 class="font-bold text-teal-400 mb-4">📊 Score & Failure Analysis</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 items-end">
-                            <select id="score-subject" class="w-full bg-black/30 border border-white/10 p-2 rounded-lg text-white text-xs"><option value="Accounts">Accounts</option><option value="Law">Law</option><option value="Maths">Maths</option><option value="Eco">Eco</option></select>
+                        <h3 class="font-bold text-teal-400 mb-4">📊 Score Log</h3>
+                        <div class="grid grid-cols-2 gap-4 items-end">
+                            <select id="score-subject" class="col-span-2 w-full bg-black/30 border border-white/10 p-2 rounded-lg text-white text-xs"><option value="Accounts">Accounts</option><option value="Law">Law</option><option value="Maths">Maths</option><option value="Eco">Eco</option></select>
                             <select id="score-tier" class="w-full bg-black/30 border border-white/10 p-2 rounded-lg text-white text-xs"><option value="100">Full</option><option value="50">Mid</option></select>
-                            <div class="col-span-2 md:col-span-1"><input id="score-marks" type="number" placeholder="Obt" class="w-full bg-black/30 border border-white/10 p-2 rounded-lg text-white text-xs"></div>
-                            <!-- NEW: Failure Reason -->
+                            <input id="score-marks" type="number" placeholder="Obt" class="w-full bg-black/30 border border-white/10 p-2 rounded-lg text-white text-xs">
                             <select id="score-reason" class="col-span-2 md:col-span-1 bg-black/30 border border-red-500/30 p-2 rounded-lg text-red-300 text-xs"><option value="None">Pass</option><option value="Concept">Concept Error</option><option value="Time">Time Out</option><option value="Silly">Silly Mistake</option></select>
                         </div>
                         <button onclick="addMockScore()" class="w-full mt-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold text-xs">LOG DATA</button>
+                        <div id="score-feedback" class="mt-2 text-xs text-emerald-400 hidden">Score Logged.</div>
                     </div>
                     <div class="glass-card p-6 rounded-2xl flex justify-between items-center">
                         <h3 class="font-bold text-white">🔗 Official ICAI Portal</h3>
@@ -371,7 +377,9 @@
         let trendChartInstance = null;
         let radarChartInstance = null;
         let timerInterval = null;
+        let timerMode = 'pomodoro';
         let base64Image = null;
+        let currentMockQuestions = "";
 
         const chapters = {
             accounts: ["Theoretical Framework", "Accounting Process", "BRS", "Inventories", "Depreciation", "Bill of Exchange", "Final Accounts", "NPO", "Company A/c", "Partnership"],
@@ -389,56 +397,85 @@
             renderChapters(); refreshAnalytics(); updateCountdown(); renderDoubtHistory(); generateDailyDirective();
         });
 
-        // --- STRATEGIC INTERVENTION SYSTEM (SIS) ---
-        function generateDailyDirective() {
-            const container = document.getElementById('directive-text');
-            const now = new Date();
-            let urgentTasks = [];
-            
-            // 1. Check Decay
-            let decayedSubs = new Set();
-            Object.keys(chapters).forEach(sub => {
-                const subState = syllabusState[sub] || {};
-                Object.keys(subState).forEach(idx => {
-                    if (Math.floor((now - new Date(subState[idx])) / 86400000) > 7) decayedSubs.add(sub);
-                });
-            });
-
-            // 2. Check Mock Failure
-            let weakSubs = [];
-            const recentMocks = mockScores.slice(0, 3);
-            recentMocks.forEach(m => { if(m.pct < 40) weakSubs.push(m.subject); });
-
-            // 3. Generate Order
-            let msg = "";
-            if (weakSubs.length > 0) {
-                msg = `<span class="text-rose-400 font-bold">⚠️ CRITICAL ALERT:</span> Your recent performance in <strong class="text-white">${weakSubs[0]}</strong> is unacceptable (<40%). Immediate Remedial Action Required. Abort standard routine. Focus 4 hours on ${weakSubs[0]} concepts today.`;
-                document.getElementById('daily-directive-panel').classList.add('border-rose-500');
-            } else if (decayedSubs.size > 0) {
-                const sub = Array.from(decayedSubs)[0];
-                msg = `<span class="text-amber-400 font-bold">⚠️ MEMORY DECAY:</span> You haven't reviewed <strong class="text-white">${sub}</strong> in over a week. The Ebbinghaus Curve is eroding your retention. Schedule a 2-hour revision block for ${sub} immediately.`;
-            } else {
-                msg = `<span class="text-emerald-400 font-bold">✅ SYSTEMS NOMINAL:</span> You are on track. Maintain aggressive momentum. Recommended: Take a Full Mock Test today to push your limits.`;
-                document.getElementById('daily-directive-panel').classList.replace('border-indigo-500', 'border-emerald-500');
-            }
-            container.innerHTML = msg;
+        // --- AUDIO REVISION (TUTOR MODE) ---
+        function base64PCMtoWAV(base64, sampleRate = 24000) {
+            const binaryString = window.atob(base64);
+            const len = binaryString.length;
+            const buffer = new ArrayBuffer(44 + len);
+            const view = new DataView(buffer);
+            const writeString = (view, offset, string) => { for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i)); };
+            writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + len, true); writeString(view, 8, 'WAVE'); writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true); view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true); writeString(view, 36, 'data');
+            view.setUint32(40, len, true);
+            const payload = new Uint8Array(buffer, 44);
+            for (let i = 0; i < len; i++) payload[i] = binaryString.charCodeAt(i);
+            return new Blob([buffer], { type: 'audio/wav' });
         }
 
-        // --- ANALYTICS (With Failure DNA) ---
+        async function generateAudioRevision() {
+            const topic = document.getElementById('audio-topic').value;
+            const btn = document.getElementById('btn-audio-gen');
+            const player = document.getElementById('audio-player');
+            const viz = document.getElementById('audio-viz');
+
+            if(!apiKey || !topic) return alert("API Key & Topic Required");
+            btn.innerText = "Generating..."; btn.disabled = true; viz.classList.remove('hidden');
+            
+            try {
+                const scriptResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: `Act as a friendly, energetic CA tutor. Create a short (100 words) audio script explaining '${topic}' to a student. Use phrases like 'Listen closely', 'Here's the trick', 'Remember this'. Make it conversational.` }] }] })
+                });
+                const scriptData = await scriptResp.json();
+                const scriptText = scriptData.candidates[0].content.parts[0].text;
+
+                const ttsResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: scriptText }] }], generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } } } })
+                });
+                const ttsData = await ttsResp.json();
+                const wavBlob = base64PCMtoWAV(ttsData.candidates[0].content.parts[0].inlineData.data);
+                
+                player.src = URL.createObjectURL(wavBlob);
+                player.classList.remove('hidden'); player.play();
+                btn.innerText = "PLAY AUDIO REV"; btn.disabled = false; viz.classList.add('hidden');
+            } catch(e) { alert("Error."); btn.disabled = false; viz.classList.add('hidden'); }
+        }
+
+        // --- SIS (AI) ---
+        async function generateDailyDirective() {
+            const container = document.getElementById('directive-text');
+            const now = new Date();
+            let decayedCount = 0;
+            Object.keys(chapters).forEach(sub => {
+                const subState = syllabusState[sub] || {};
+                Object.keys(subState).forEach(idx => { if (Math.floor((now - new Date(subState[idx])) / 86400000) > 7) decayedCount++; });
+            });
+            
+            let recentAvg = 0;
+            if(mockScores.length > 0) recentAvg = Math.round(mockScores.slice(0,3).reduce((a,b)=>a+b.pct,0)/Math.min(3, mockScores.length));
+            
+            const context = `Student Stats: Mock Avg ${recentAvg}%, ${decayedCount} topics decaying. Tests taken: ${mockScores.length}.`;
+            if(!apiKey) { container.innerHTML = "Connect API to receive tactical orders."; return; }
+
+            const sys = `Military Commander for CA Students. Input: Stats. Output: 2-sentence order. Avg<40%: Ruthless. Avg>70%: Encouraging. High Decay: Revision.`;
+            try {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: context }] }], systemInstruction: { parts: [{ text: sys }] } }) });
+                const data = await resp.json();
+                container.innerHTML = data.candidates[0].content.parts[0].text;
+            } catch(e) { container.innerHTML = "Tactical Link Offline. Focus on weak areas."; }
+        }
+
+        // --- ANALYTICS ---
         function refreshAnalytics() {
-            let total = 0, done = 0, critical = 0, wTotal = 0, wDone = 0; const now = new Date();
+            const setText = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
+            let total = 0, wTotal = 0, wDone = 0, critical = 0; const now = new Date();
             Object.keys(chapters).forEach(sub => {
                 total += chapters[sub].length; const weights = chapterWeights[sub]; const subState = syllabusState[sub] || {};
                 weights.forEach((w, idx) => { wTotal += w; if(subState[idx]) wDone += w; });
                 Object.keys(subState).forEach(idx => { if (Math.floor((now - new Date(subState[idx])) / 86400000) > 7) critical++; });
-                done += Object.keys(subState).length;
             });
 
             const sylPct = Math.round((wDone/wTotal)*100)||0;
-            
-            // SAFE ELEMENT UPDATE FUNCTION
-            const setText = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
-            
             setText('dash-syllabus-pct', `${sylPct}%`);
             const bar = document.getElementById('bar-syllabus'); if(bar) bar.style.width = `${sylPct}%`;
             setText('dash-critical-revs', critical);
@@ -447,11 +484,9 @@
             const fM = mockScores.filter(s => s.tier === 100); const pM = mockScores.filter(s => s.tier < 100);
             const fAvg = fM.length ? Math.round(fM.reduce((a,b)=>a+b.pct,0)/fM.length) : 0;
             const pAvg = pM.length ? Math.round(pM.reduce((a,b)=>a+b.pct,0)/pM.length) : 0;
-            
             setText('dash-full-avg', fM.length ? `${fAvg}%` : "--");
             setText('dash-part-avg', pM.length ? `${pAvg}%` : "--");
             
-            // Sessions Calculation
             let sessForSyl = 0; Object.keys(chapters).forEach(sub => { chapterWeights[sub].forEach((w, idx) => { if(!(syllabusState[sub]||{})[idx]) sessForSyl += w; }); });
             let sessForScore = (fM.length ? fAvg : pAvg) < 75 ? Math.ceil((75 - (fM.length ? fAvg : pAvg)) / 2) : 0;
             setText('dash-sessions-needed', sessForSyl + sessForScore);
@@ -459,30 +494,21 @@
             let comp = ((wDone/wTotal)*100 * 0.6) + ((fM.length ? fAvg : pAvg*0.8) * 0.4); if(critical > 5) comp -= 5;
             comp = Math.min(Math.max(Math.round(comp), 0), 100);
             setText('competency-val', `${comp}%`);
-            setText('readiness-badge', `LEVEL ${comp}`);
-            
+            setText('readiness-badge', `${comp}%`);
             renderCharts();
         }
 
         function renderCharts() {
-            const ctxTrendEl = document.getElementById('trendChart');
-            if(!ctxTrendEl) return;
-            const ctxTrend = ctxTrendEl.getContext('2d');
-            
+            const ctxTrendEl = document.getElementById('trendChart'); if(!ctxTrendEl) return;
+            const ctxRadarEl = document.getElementById('radarChart'); if(!ctxRadarEl) return;
             const recent = mockScores.slice(-10);
-            const tLabels = recent.map((s, i) => `T${i+1}`);
-            const tData = recent.map(s => s.pct);
+            const tLabels = recent.map((s, i) => `T${i+1}`); const tData = recent.map(s => s.pct);
             if(trendChartInstance) trendChartInstance.destroy();
-            trendChartInstance = new Chart(ctxTrend, { type: 'line', data: { labels: tLabels, datasets: [{ label: 'Score %', data: tData, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } } });
-
-            const ctxRadarEl = document.getElementById('radarChart');
-            if(!ctxRadarEl) return;
-            const ctxRadar = ctxRadarEl.getContext('2d');
-            
+            trendChartInstance = new Chart(ctxTrendEl.getContext('2d'), { type: 'line', data: { labels: tLabels, datasets: [{ label: 'Score %', data: tData, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } } });
             const subs = ["Accounts", "Law", "Maths", "Eco"];
             const rData = subs.map(s => { const sc = mockScores.filter(m => m.subject === s); return sc.length ? Math.round(sc.reduce((a,b)=>a+b.pct,0)/sc.length) : 0; });
             if(radarChartInstance) radarChartInstance.destroy();
-            radarChartInstance = new Chart(ctxRadar, { type: 'radar', data: { labels: subs, datasets: [{ label: 'Strength', data: rData, backgroundColor: 'rgba(45, 212, 191, 0.2)', borderColor: '#2dd4bf' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, angleLines: { color: 'rgba(255,255,255,0.05)' } } }, plugins: { legend: { display: false } } } });
+            radarChartInstance = new Chart(ctxRadarEl.getContext('2d'), { type: 'radar', data: { labels: subs, datasets: [{ label: 'Strength', data: rData, backgroundColor: 'rgba(45, 212, 191, 0.2)', borderColor: '#2dd4bf' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, angleLines: { color: 'rgba(255,255,255,0.05)' } } }, plugins: { legend: { display: false } } } });
         }
 
         // --- NAVIGATION & UI ---
@@ -556,6 +582,7 @@
             modal.classList.remove('hidden'); reveal.classList.add('hidden');
             document.getElementById('paper-subject-display').innerText = `${sub} (${tier}%)`.toUpperCase();
             content.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-400"><div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div><p>Architecting Exam Paper...</p></div>`;
+            currentMockQuestions = "";
 
             const sys = `You are the ICAI Board of Studies. Create a professionally formatted Mock Test Paper for CA Foundation: ${sub} (${tier}% Syllabus).
             CRITICAL: **STRICTLY NEW SCHEME ONLY** (No BCR/BCK).
@@ -568,14 +595,41 @@
                - Law: Scenario-based.
             4. Solutions: Hidden div id="solutions-block" class="hidden solution-section"><h2>SOLUTIONS & MARKING SCHEME</h2> ... </div>
             * Precede this block with: <div id="solutions-divider" class="hidden"></div>
+            NO MARKDOWN. ONLY RAW HTML.`;
 
-            NO MARKDOWN. ONLY RAW HTML. Make it look like a printed exam paper.`;
-
-            try { const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: "Generate Paper" }] }], systemInstruction: { parts: [{ text: sys }] } }) }); const data = await resp.json(); content.innerHTML = data.candidates[0].content.parts[0].text; reveal.classList.remove('hidden'); } catch(e) { content.innerHTML = "Error."; }
+            try { 
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: "Generate Paper" }] }], systemInstruction: { parts: [{ text: sys }] } }) }); 
+                const data = await resp.json(); 
+                const text = data.candidates[0].content.parts[0].text;
+                content.innerHTML = text; 
+                currentMockQuestions = text.split("SOLUTIONS")[0]; 
+                reveal.classList.remove('hidden'); 
+            } catch(e) { content.innerHTML = "Error."; }
         }
         function toggleSolutions() { document.getElementById('solutions-block').classList.remove('hidden'); document.getElementById('solutions-block').scrollIntoView({behavior: 'smooth'}); }
         function closePaperModal() { document.getElementById('paper-modal').classList.add('hidden'); }
         function printPaper() { const c = document.getElementById('paper-content').innerHTML; const w = window.open(); w.document.write(`<html><head><title>Mock Paper</title></head><body style="font-family:serif; line-height:1.6; padding:40px;">${c}</body></html>`); w.print(); w.close(); }
+        
+        function transferToAuditor() {
+            closePaperModal();
+            switchTab('auditor');
+            document.getElementById('audit-question').value = "Current Mock Test Simulation";
+            document.getElementById('audit-text-fallback').value = "I have written answers for the generated mock. Please evaluate based on the questions generated.";
+            document.getElementById('mock-audit-banner').classList.remove('hidden');
+        }
+
+        // --- CASE STUDY ARCHITECT ---
+        async function generateCaseSolution() {
+            const scenario = document.getElementById('case-input').value;
+            const modal = document.getElementById('paper-modal');
+            const content = document.getElementById('paper-content');
+            if(!apiKey || !scenario) return alert("API Key & Scenario Required");
+            modal.classList.remove('hidden'); document.getElementById('modal-title').innerText = "Case Study Analysis";
+            document.getElementById('btn-reveal-solutions').classList.add('hidden');
+            content.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-400"><div class="loader mb-4"></div><p>Architecting Solution...</p></div>`;
+            const sys = `You are a CA Examiner. Solve this case study in strict ICAI Format. Output HTML: <h1>CASE ANALYSIS</h1> <h3>1. PROVISION OF LAW</h3>... <h3>2. FACTS OF THE CASE</h3>... <h3>3. ANALYSIS</h3>... <h3>4. CONCLUSION</h3>. NO MARKDOWN.`;
+            try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: scenario }] }], systemInstruction: { parts: [{ text: sys }] } }) }); const d = await r.json(); content.innerHTML = d.candidates[0].content.parts[0].text; } catch(e) { content.innerHTML = "Error."; }
+        }
 
         // --- AUDIT ---
         function handleImagePreview(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { base64Image = e.target.result.split(',')[1]; }; reader.readAsDataURL(input.files[0]); } }
@@ -583,9 +637,15 @@
             const q = document.getElementById('audit-question').value; const m = document.getElementById('audit-marks').value; const t = document.getElementById('audit-text-fallback').value; const s = document.getElementById('audit-strictness').value; const out = document.getElementById('audit-result');
             if(!apiKey) return alert("API Key Needed");
             out.innerHTML = `<div class="flex items-center gap-2 text-indigo-300"><div class="loader"></div> <span>Examiner Checking...</span></div>`;
-            let parts = [{ text: `Q: ${q} (${m} marks). Strictness: ${s}` }];
+            
+            let contextQ = q;
+            if(q === "Current Mock Test Simulation" && currentMockQuestions) {
+                contextQ = "Evaluating answers for this Mock Paper: " + currentMockQuestions.substring(0, 2000);
+            }
+
+            let parts = [{ text: `Context/Question: ${contextQ} (${m} marks). Strictness: ${s}` }];
             if(base64Image) parts.push({ inlineData: { mimeType: "image/jpeg", data: base64Image } });
-            if(t) parts.push({ text: `Answer Text: ${t}` });
+            if(t) parts.push({ text: `Student Answer: ${t}` });
             const sys = `ICAI Examiner. Grade out of ${m}. Check Keywords, Sections, Steps. Output HTML breakdown.`;
             try { const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ role: "user", parts: parts }], systemInstruction: { parts: [{ text: sys }] } }) }); const data = await resp.json(); out.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>'); } catch(e) { out.innerHTML = "Error."; }
         }
