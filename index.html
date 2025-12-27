@@ -32,12 +32,13 @@
                         'float': 'float 8s ease-in-out infinite',
                         'slide-up': 'slideUp 0.5s ease-out forwards',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'sound-wave': 'sound 0.8s ease-in-out infinite alternate',
+                        'sound-wave': 'soundWave 0.8s ease-in-out infinite alternate',
                     },
                     keyframes: {
                         float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
                         slideUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        sound: { '0%': { height: '20%' }, '100%': { height: '100%' } }
+                        // renamed to soundWave to avoid mismatch with CSS animation naming
+                        soundWave: { '0%': { height: '20%' }, '100%': { height: '100%' } }
                     }
                 }
             }
@@ -74,7 +75,7 @@
         .ai-response strong { color: #818cf8; } 
 
         /* Audio Viz */
-        .bar { width: 4px; background: #a855f7; border-radius: 2px; animation: sound-wave 0.5s ease-in-out infinite alternate; }
+        .bar { width: 4px; background: #a855f7; border-radius: 2px; animation: soundWave 0.5s ease-in-out infinite alternate; }
         .bar:nth-child(odd) { animation-duration: 0.4s; }
     </style>
 </head>
@@ -88,7 +89,7 @@
         <div class="glass-card rounded-2xl p-8 w-full max-w-md border border-white/10">
             <h3 class="text-xl font-bold text-white mb-2">⚙️ SYSTEM CONFIG</h3>
             <p class="text-sm text-slate-400 mb-6">Enter Gemini API Key for AI features.</p>
-            <input type="password" id="api-key-input" placeholder="Paste API Key" class="w-full p-3 bg-black/50 border border-white/10 rounded-xl focus:border-indigo-500 outline-none font-mono text-sm text-white mb-4">
+            <input type="password" id="api-key-input" placeholder="Paste API Key" class="w-full p-3 bg-black/50 border border-white/10 rounded-xl focus:border-indigo-500 outline-none font-mono text-sm">
             <button onclick="saveApiKey()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition-all">CONNECT</button>
             <button onclick="toggleSettings()" class="w-full py-3 text-xs text-slate-500 hover:text-slate-300 mt-2">CLOSE</button>
         </div>
@@ -105,10 +106,10 @@
                 </div>
             </div>
             <div class="flex gap-2">
-                <button onclick="transferToAuditor()" id="btn-transfer-audit" class="px-4 py-2 bg-indigo-600 text-white border border-indigo-500 rounded-lg text-xs font-bold hover:bg-indigo-500 transition-colors flex items-center gap-2">
+                <button onclick="transferToAuditor()" id="btn-transfer-audit" class="px-4 py-2 bg-indigo-600 text-white border border-indigo-500 rounded-lg text-xs font-bold hover:bg-indigo-500 transition-all">
                     <span>📝</span> Submit for Evaluation
                 </button>
-                <button onclick="toggleSolutions()" id="btn-reveal-solutions" class="px-4 py-2 bg-emerald-600/20 text-emerald-400 border border-emerald-600/50 rounded-lg text-xs font-bold hover:bg-emerald-600/30 hidden">Reveal Key</button>
+                <button onclick="toggleSolutions()" id="btn-reveal-solutions" class="px-4 py-2 bg-emerald-600/20 text-emerald-400 border border-emerald-600/50 rounded-lg text-xs font-bold hover:bg-emerald-600/30">REVEAL SOLUTIONS</button>
                 <button onclick="printPaper()" class="px-4 py-2 bg-white text-slate-900 rounded-lg text-xs font-bold hover:bg-slate-200">Print PDF</button>
                 <button onclick="closePaperModal()" class="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg">✕</button>
             </div>
@@ -132,7 +133,7 @@
 
     <!-- SIDEBAR -->
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/80 z-30 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
-    <nav id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 glass-card border-r-0 md:border-r border-white/5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-out flex flex-col h-full shrink-0">
+    <nav id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 glass-card border-r-0 md:border-r border-white/5 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
         <div class="p-6 border-b border-white/5 hidden md:block">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">CA</div>
@@ -156,7 +157,7 @@
                 <span class="text-[10px] font-bold text-slate-500 tracking-wider">COMPETENCY</span>
                 <span id="readiness-badge" class="text-[10px] bg-white/5 text-white px-2 py-0.5 rounded border border-white/10 font-mono">--%</span>
             </div>
-            <button onclick="toggleSettings()" class="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all">⚙️ CONFIG</button>
+            <button onclick="toggleSettings()" class="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all">⚙️ SETTINGS</button>
         </div>
     </nav>
 
@@ -256,7 +257,7 @@
                         <h3 class="font-bold flex items-center gap-2 text-indigo-400 text-sm">🎓 Chief Examiner AI</h3>
                         <div class="text-[9px] border border-indigo-500/30 text-indigo-300 px-2 py-1 rounded">Strict Mode</div>
                     </div>
-                    <div id="ai-concept-output" class="bg-black/30 rounded-xl p-4 text-sm text-indigo-100 overflow-y-auto custom-scroll mb-4 hidden border border-white/5 shadow-inner ai-response max-h-48 leading-relaxed"></div>
+                    <div id="ai-concept-output" class="bg-black/30 rounded-xl p-4 text-sm text-indigo-100 overflow-y-auto custom-scroll mb-4 hidden border border-white/5 shadow-inner ai-response max-h-96"></div>
                     <div id="doubt-history-container" class="flex-1 bg-black/20 rounded-xl p-3 overflow-hidden flex flex-col border border-white/5 min-h-0">
                         <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-2 shrink-0">
                             <span class="text-[10px] font-bold text-slate-500 uppercase">INTEL LOG</span>
@@ -265,7 +266,7 @@
                         <div id="doubt-history-list" class="overflow-y-auto custom-scroll space-y-2 text-xs text-slate-400 flex-1"></div>
                     </div>
                     <div class="flex gap-2 mt-3 pt-2 border-t border-white/5 shrink-0">
-                        <input type="text" id="ai-concept-query" placeholder="Ask concept..." class="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500/50 w-full">
+                        <input type="text" id="ai-concept-query" placeholder="Ask concept..." class="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none">
                         <button onclick="askExaminer()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-indigo-500">ASK</button>
                     </div>
                 </div>
@@ -277,13 +278,13 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="glass-card p-6 rounded-2xl">
                     <h3 class="font-bold text-indigo-400 mb-4">Focus Timer</h3>
-                    <div class="flex gap-2 mb-6"><button id="btn-mode-pom" onclick="setTimerMode('pomodoro')" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white/5 text-white border border-white/10">Pomodoro</button><button id="btn-mode-deep" onclick="setTimerMode('deep')" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white/5 text-white border border-white/10">Deep Work</button></div>
-                    <div class="text-center mb-6"><div id="timer-display" class="text-5xl font-mono font-bold text-white tracking-widest">25:00</div><div id="timer-status" class="text-xs text-slate-500 uppercase mt-2">Ready</div></div>
+                    <div class="flex gap-2 mb-6"><button id="btn-mode-pom" onclick="setTimerMode('pomodoro')" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white/5 text-white border border-white/10">Pomodoro</button><button id="btn-mode-deep" onclick="setTimerMode('deep')" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white/5 text-slate-400 border border-white/10">Deep Work</button></div>
+                    <div class="text-center mb-6"><div id="timer-display" class="text-5xl font-mono font-bold text-white tracking-widest">25:00</div><div id="timer-status" class="text-xs text-slate-500 mt-2">Idle</div></div>
                     <button onclick="startTimer()" class="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-500">START</button>
                 </div>
                 <div class="glass-card p-6 rounded-2xl lg:col-span-2">
                     <h3 class="font-bold text-slate-300 mb-4">Routine Generator</h3>
-                    <div class="flex gap-3 mb-4"><input type="time" id="plan-start" value="07:00" class="bg-black/30 border border-white/10 rounded-lg p-2 text-white text-sm"><select id="plan-hours" class="bg-black/30 border border-white/10 rounded-lg p-2 text-white text-sm"><option value="4">4 Hours</option><option value="8">8 Hours</option><option value="12">12 Hours</option></select><button onclick="generatePlan()" class="bg-indigo-600 text-white px-4 rounded-lg text-xs font-bold">GENERATE</button></div>
+                    <div class="flex gap-3 mb-4"><input type="time" id="plan-start" value="07:00" class="bg-black/30 border border-white/10 rounded-lg p-2 text-white text-sm"><select id="plan-hours" class="bg-black/30 border border-white/10 rounded-lg p-2 text-white text-sm"><option value="3">3</option><option value="6">6</option><option value="9">9</option></select></div>
                     <div id="schedule-list" class="space-y-2 max-h-96 overflow-y-auto custom-scroll">
                         <div class="text-center text-slate-500 text-xs italic py-12">Select your intensity to generate a psych-optimized schedule.</div>
                     </div>
@@ -307,11 +308,11 @@
                         <span class="text-xs text-slate-500">Max Marks</span>
                     </div>
                     
-                    <div class="border-2 border-dashed border-white/10 rounded-lg p-4 text-center hover:bg-white/5 cursor-pointer relative"><input type="file" onchange="handleImagePreview(this)" class="absolute inset-0 opacity-0 cursor-pointer"><span class="text-xs text-slate-400">📸 Upload Sheet</span></div>
+                    <div class="border-2 border-dashed border-white/10 rounded-lg p-4 text-center hover:bg-white/5 cursor-pointer relative"><input type="file" onchange="handleImagePreview(this)" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"><div class="text-xs text-slate-400">Upload answer image (optional)</div></div>
                     <textarea id="audit-text-fallback" class="w-full h-32 bg-black/30 border border-white/10 rounded-lg p-3 text-sm text-white placeholder-slate-600" placeholder="Or type answer..."></textarea>
-                    <div class="flex gap-2"><select id="audit-strictness" class="bg-black/30 border border-white/10 rounded-lg p-2 text-white text-xs"><option>Strict</option><option>Lenient</option></select><button onclick="auditAnswerWithImage()" class="flex-1 bg-indigo-600 text-white rounded-lg font-bold text-sm">AUDIT</button></div>
+                    <div class="flex gap-2"><select id="audit-strictness" class="bg-black/30 border border-white/10 rounded-lg p-2 text-white text-xs"><option>Strict</option><option>Lenient</option></select><button onclick="auditAnswerWithImage()" class="ml-auto bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-indigo-500">EVALUATE</button></div>
                 </div>
-                <div class="glass-card p-6 rounded-2xl flex flex-col"><h3 class="text-xs font-bold text-slate-500 mb-2">FEEDBACK</h3><div id="audit-result" class="flex-1 overflow-y-auto custom-scroll text-sm text-slate-300 ai-response"></div></div>
+                <div class="glass-card p-6 rounded-2xl flex flex-col"><h3 class="text-xs font-bold text-slate-500 mb-2">FEEDBACK</h3><div id="audit-result" class="flex-1 overflow-y-auto custom-scroll text-xs text-slate-300"></div></div>
             </div>
         </section>
 
@@ -324,7 +325,7 @@
                     <h3 class="font-bold text-purple-400 mb-4">🎧 Audio Tutor Pod</h3>
                     <input id="audio-topic" class="w-full p-3 bg-black/30 border border-white/10 rounded-lg text-xs text-white mb-3 outline-none" placeholder="Enter Topic...">
                     <button onclick="generateAudioRevision()" id="btn-audio-gen" class="w-full py-2 bg-purple-600 text-white font-bold rounded-lg text-xs hover:bg-purple-500 mb-2">GENERATE & PLAY</button>
-                    <div id="audio-viz" class="hidden flex justify-center gap-1 h-4 items-end opacity-80"><div class="bar"></div><div class="bar" style="animation-delay:-0.1s"></div><div class="bar" style="animation-delay:-0.2s"></div><div class="bar"></div></div>
+                    <div id="audio-viz" class="hidden flex justify-center gap-1 h-4 items-end opacity-80"><div class="bar"></div><div class="bar" style="animation-delay:-0.1s"></div><div class="bar" style="animation-delay:-0.2s"></div><div class="bar" style="animation-delay:-0.3s"></div></div>
                     <audio id="audio-player" controls class="w-full mt-2 hidden h-8"></audio>
                 </div>
 
@@ -339,8 +340,8 @@
                 <div class="glass-card p-6 rounded-2xl border-t-4 border-amber-500 lg:col-span-2">
                     <h3 class="font-bold text-amber-400 mb-4">🤖 AI Paper Architect</h3>
                     <div class="flex gap-4">
-                        <select id="gen-subject" class="flex-1 bg-black/30 border border-white/10 p-3 rounded-lg text-white text-sm"><option value="Accounts">Accounting</option><option value="Law">Business Laws</option><option value="Maths">Quant Aptitude</option><option value="Eco">Economics</option></select>
-                        <select id="gen-type" class="flex-1 bg-black/30 border border-white/10 p-3 rounded-lg text-white text-sm"><option value="30">Unit Test (30%)</option><option value="50">Mid-Term (50%)</option><option value="100">Full Mock</option></select>
+                        <select id="gen-subject" class="flex-1 bg-black/30 border border-white/10 p-3 rounded-lg text-white text-sm"><option value="Accounts">Accounting</option><option value="Law">Business Laws</option><option value="Maths">Maths/Stats</option><option value="Eco">Economics</option></select>
+                        <select id="gen-type" class="flex-1 bg-black/30 border border-white/10 p-3 rounded-lg text-white text-sm"><option value="30">Unit Test (30%)</option><option value="50">Mid-Term (50%)</option><option value="100">Full (100%)</option></select>
                         <button onclick="generateMockPaper()" class="flex-1 bg-white text-black font-bold rounded-lg text-xs hover:bg-slate-200">LAUNCH SIMULATION</button>
                     </div>
                 </div>
@@ -350,9 +351,9 @@
                         <h3 class="font-bold text-teal-400 mb-4">📊 Score Log</h3>
                         <div class="grid grid-cols-2 gap-4 items-end">
                             <select id="score-subject" class="col-span-2 w-full bg-black/30 border border-white/10 p-2 rounded-lg text-white text-xs"><option value="Accounts">Accounts</option><option value="Law">Law</option><option value="Maths">Maths</option><option value="Eco">Eco</option></select>
-                            <select id="score-tier" class="w-full bg-black/30 border border-white/10 p-2 rounded-lg text-white text-xs"><option value="100">Full</option><option value="50">Mid</option></select>
+                            <select id="score-tier" class="w-full bg-black/30 border border-white/10 p-2 rounded-lg text-white text-xs"><option value="100">Full</option><option value="50">Mid</option><option value="30">Unit</option></select>
                             <input id="score-marks" type="number" placeholder="Obt" class="w-full bg-black/30 border border-white/10 p-2 rounded-lg text-white text-xs">
-                            <select id="score-reason" class="col-span-2 md:col-span-1 bg-black/30 border border-red-500/30 p-2 rounded-lg text-red-300 text-xs"><option value="None">Pass</option><option value="Concept">Concept Error</option><option value="Time">Time Out</option><option value="Silly">Silly Mistake</option></select>
+                            <select id="score-reason" class="col-span-2 md:col-span-1 bg-black/30 border border-red-500/30 p-2 rounded-lg text-red-300 text-xs"><option value="None">Pass</option><option value="Flawed">Weakness</option></select>
                         </div>
                         <button onclick="addMockScore()" class="w-full mt-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold text-xs">LOG DATA</button>
                         <div id="score-feedback" class="mt-2 text-xs text-emerald-400 hidden">Score Logged.</div>
@@ -424,16 +425,18 @@
             
             try {
                 const scriptResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: `Act as a friendly, energetic CA tutor. Create a short (100 words) audio script explaining '${topic}' to a student. Use phrases like 'Listen closely', 'Here's the trick', 'Remember this'. Make it conversational.` }] }] })
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: `Act as a friendly, energetic CA tutor. Create a short (100 words) script about ${topic} suitable for audio revision.` }] }] })
                 });
                 const scriptData = await scriptResp.json();
-                const scriptText = scriptData.candidates[0].content.parts[0].text;
+                const scriptText = (scriptData && scriptData.candidates && scriptData.candidates[0] && scriptData.candidates[0].content && scriptData.candidates[0].content.parts && scriptData.candidates[0].content.parts[0] && scriptData.candidates[0].content.parts[0].text) || '';
 
                 const ttsResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: scriptText }] }], generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } } } })
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: scriptText }] }], generationConfig: { responseModalities: ["AUDIO"] } })
                 });
                 const ttsData = await ttsResp.json();
-                const wavBlob = base64PCMtoWAV(ttsData.candidates[0].content.parts[0].inlineData.data);
+                const b64 = (ttsData && ttsData.candidates && ttsData.candidates[0] && ttsData.candidates[0].content && ttsData.candidates[0].content.parts && ttsData.candidates[0].content.parts[0] && ttsData.candidates[0].content.parts[0].inlineData && ttsData.candidates[0].content.parts[0].inlineData.data) || '';
+                if(!b64) throw new Error('No audio returned');
+                const wavBlob = base64PCMtoWAV(b64);
                 
                 player.src = URL.createObjectURL(wavBlob);
                 player.classList.remove('hidden'); player.play();
@@ -452,16 +455,21 @@
             });
             
             let recentAvg = 0;
-            if(mockScores.length > 0) recentAvg = Math.round(mockScores.slice(0,3).reduce((a,b)=>a+b.pct,0)/Math.min(3, mockScores.length));
+            if(mockScores.length > 0) {
+                const recent = mockScores.slice(-3);
+                const sum = recent.reduce((acc, s) => acc + (s.pct || 0), 0);
+                recentAvg = Math.round(sum / recent.length);
+            }
             
             const context = `Student Stats: Mock Avg ${recentAvg}%, ${decayedCount} topics decaying. Tests taken: ${mockScores.length}.`;
             if(!apiKey) { container.innerHTML = "Connect API to receive tactical orders."; return; }
 
             const sys = `Military Commander for CA Students. Input: Stats. Output: 2-sentence order. Avg<40%: Ruthless. Avg>70%: Encouraging. High Decay: Revision.`;
             try {
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: context }] }], systemInstruction: { parts: [{ text: sys }] } }) });
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: context }] }], temperature: 0.2 }) });
                 const data = await resp.json();
-                container.innerHTML = data.candidates[0].content.parts[0].text;
+                const text = (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) || 'Tactical Link Offline. Focus on weak areas.';
+                container.innerHTML = text;
             } catch(e) { container.innerHTML = "Tactical Link Offline. Focus on weak areas."; }
         }
 
@@ -504,52 +512,57 @@
             const recent = mockScores.slice(-10);
             const tLabels = recent.map((s, i) => `T${i+1}`); const tData = recent.map(s => s.pct);
             if(trendChartInstance) trendChartInstance.destroy();
-            trendChartInstance = new Chart(ctxTrendEl.getContext('2d'), { type: 'line', data: { labels: tLabels, datasets: [{ label: 'Score %', data: tData, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } } });
+            trendChartInstance = new Chart(ctxTrendEl.getContext('2d'), { type: 'line', data: { labels: tLabels, datasets: [{ label: 'Score %', data: tData, borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
             const subs = ["Accounts", "Law", "Maths", "Eco"];
             const rData = subs.map(s => { const sc = mockScores.filter(m => m.subject === s); return sc.length ? Math.round(sc.reduce((a,b)=>a+b.pct,0)/sc.length) : 0; });
             if(radarChartInstance) radarChartInstance.destroy();
-            radarChartInstance = new Chart(ctxRadarEl.getContext('2d'), { type: 'radar', data: { labels: subs, datasets: [{ label: 'Strength', data: rData, backgroundColor: 'rgba(45, 212, 191, 0.2)', borderColor: '#2dd4bf' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, angleLines: { color: 'rgba(255,255,255,0.05)' } } }, plugins: { legend: { display: false } } } });
+            radarChartInstance = new Chart(ctxRadarEl.getContext('2d'), { type: 'radar', data: { labels: subs, datasets: [{ label: 'Strength', data: rData, backgroundColor: 'rgba(45, 212, 191, 0.2)', borderColor: '#2dd4bf' }] }, options: { responsive: true, maintainAspectRatio: false } });
         }
 
         // --- NAVIGATION & UI ---
         function switchTab(tabId) {
-            ['dashboard', 'syllabus', 'auditor', 'armory', 'planner'].forEach(id => { document.getElementById(`view-${id}`).classList.add('hidden'); document.getElementById(`btn-${id}`).classList.remove('active'); });
-            document.getElementById(`view-${tabId}`).classList.remove('hidden'); document.getElementById(`btn-${tabId}`).classList.add('active');
+            ['dashboard', 'syllabus', 'auditor', 'armory', 'planner'].forEach(id => { const view = document.getElementById(`view-${id}`); const btn = document.getElementById(`btn-${id}`); if(view) view.classList.add('hidden'); if(btn) btn.classList.remove('active'); });
+            const targetView = document.getElementById(`view-${tabId}`); const targetBtn = document.getElementById(`btn-${tabId}`);
+            if(targetView) targetView.classList.remove('hidden'); if(targetBtn) targetBtn.classList.add('active');
             if(tabId === 'dashboard') { refreshAnalytics(); generateDailyDirective(); }
             toggleSidebar(true);
         }
-        function toggleSidebar(forceClose = false) { const sb = document.getElementById('sidebar'); const ov = document.getElementById('sidebar-overlay'); if(forceClose) { sb.classList.add('-translate-x-full'); ov.classList.add('hidden'); } else { sb.classList.toggle('-translate-x-full'); ov.classList.toggle('hidden'); } }
-        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
-        function saveApiKey() { const key = document.getElementById('api-key-input').value.trim(); if(key) { apiKey = key; localStorage.setItem('icai_api_key', key); toggleSettings(); alert("Uplink Established."); } }
+        function toggleSidebar(forceClose = false) { const sb = document.getElementById('sidebar'); const ov = document.getElementById('sidebar-overlay'); if(!sb) return; if(forceClose) { sb.classList.add('-translate-x-full'); if(ov) ov.classList.add('hidden'); return; } sb.classList.toggle('-translate-x-full'); if(ov) ov.classList.toggle('hidden'); }
+        function toggleSettings() { const el = document.getElementById('settings-modal'); if(el) el.classList.toggle('hidden'); }
+        function saveApiKey() { const keyEl = document.getElementById('api-key-input'); const key = keyEl ? keyEl.value.trim() : ''; if(key) { apiKey = key; localStorage.setItem('icai_api_key', key); toggleSettings(); alert("Uplink Established."); } else alert('Enter a valid API key.'); }
 
         // --- SYLLABUS ---
         function renderChapters() {
-            const sub = document.getElementById('subject-selector').value; const con = document.getElementById('chapter-list'); const state = syllabusState[sub] || {}; const weights = chapterWeights[sub];
-            con.innerHTML = chapters[sub].map((c, i) => {
+            const sub = (document.getElementById('subject-selector') && document.getElementById('subject-selector').value) || 'accounts';
+            const con = document.getElementById('chapter-list'); const state = syllabusState[sub] || {}; const weights = chapterWeights[sub] || [];
+            if(!con) return;
+            const list = chapters[sub] || [];
+            con.innerHTML = list.map((c, i) => {
                 const date = state[i]; let color = "bg-white/5", text = "Pending";
                 if(date) { const d = Math.floor((new Date()-new Date(date))/86400000); if(d<3){color="bg-emerald-500"; text="Fresh";} else if(d<7){color="bg-amber-500"; text="Review";} else {color="bg-rose-500"; text="Decay";} }
-                return `<div onclick="toggleChapter('${sub}',${i})" class="flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group"><div><span class="text-sm font-medium text-slate-300 group-hover:text-white">${c}</span><span class="text-[9px] ml-2 text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">${weights[i]} Sess</span></div><div class="flex items-center gap-2"><span class="text-[10px] text-slate-500">${text}</span><span class="w-2 h-2 rounded-full ${color} shadow-[0_0_8px_${color}]"></span></div></div>`;
+                return `<div onclick="toggleChapter('${sub}',${i})" class="flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group"><div><div class=\"font-bold text-sm text-white\">${c}</div><div class=\"text-[10px] text-slate-400\">${text}</div></div><div class=\"w-8 h-8 rounded-full ${color}\"></div></div>`;
             }).join(''); refreshAnalytics();
         }
         function toggleChapter(sub, idx) { if (!syllabusState[sub]) syllabusState[sub] = {}; syllabusState[sub][idx] = new Date().toISOString(); localStorage.setItem('icai_syllabus_v6pro', JSON.stringify(syllabusState)); renderChapters(); }
 
         // --- AI (EXAMINER) ---
         async function askExaminer() {
-            const q = document.getElementById('ai-concept-query').value; const out = document.getElementById('ai-concept-output');
+            const qEl = document.getElementById('ai-concept-query'); const out = document.getElementById('ai-concept-output');
+            const q = qEl ? qEl.value : '';
             if(!q || !apiKey) return alert("API Key Needed");
-            out.classList.remove('hidden'); document.getElementById('doubt-history-container').classList.add('hidden');
-            out.innerHTML = `<div class="flex items-center gap-2 text-indigo-300"><div class="loader"></div> <span>Accessing Neural Database...</span></div>`;
-            const sys = `Chief Examiner for ICAI Foundation. Domain: Accounts, Law, Maths, Eco. Rules: 1. Strict Technical Terms only. 2. If unrelated (movies/coding), REPLY: '⚠️ DISTRACTION DETECTED. Penalty Applied.'`;
+            if(out) out.classList.remove('hidden'); const container = document.getElementById('doubt-history-container'); if(container) container.classList.add('hidden');
+            if(out) out.innerHTML = `<div class="flex items-center gap-2 text-indigo-300"><div class="loader"></div> <span>Accessing Neural Database...</span></div>`;
+            const sys = `Chief Examiner for ICAI Foundation. Domain: Accounts, Law, Maths, Eco. Rules: 1. Strict Technical Terms only. 2. If unrelated (movies/coding), REPLY: '⚠️ DISTRACTION DETECTED'.`;
             try {
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: q }] }], systemInstruction: { parts: [{ text: sys }] } }) });
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: q }] }], temperature: 0.2 }) });
                 const data = await resp.json();
-                const ans = data.candidates[0].content.parts[0].text;
-                out.innerHTML = ans.replace(/\*\*(.*?)\*\*/g, '<strong class="text-indigo-400">$1</strong>').replace(/\n/g, '<br>');
-                if(!ans.includes("DISTRACTION")) { doubtHistory.unshift({ q: q, a: ans.substring(0, 80) + "..." }); localStorage.setItem('icai_doubt_history', JSON.stringify(doubtHistory)); renderDoubtHistory(); }
-                document.getElementById('doubt-history-container').classList.remove('hidden');
-            } catch(e) { out.innerHTML = "Error."; }
+                const ans = (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) || '';
+                if(out) out.innerHTML = ans.replace(/\*\*(.*?)\*\*/g, '<strong class="text-indigo-400">$1</strong>').replace(/\n/g, '<br>');
+                if(!ans.includes("DISTRACTION")) { doubtHistory.unshift({ q: q, a: (ans || '').substring(0, 80) + (ans.length>80?"...":"") }); localStorage.setItem('icai_doubt_history', JSON.stringify(doubtHistory)); renderDoubtHistory(); }
+                const container2 = document.getElementById('doubt-history-container'); if(container2) container2.classList.remove('hidden');
+            } catch(e) { if(out) out.innerHTML = "Error."; }
         }
-        function renderDoubtHistory() { const list = document.getElementById('doubt-history-list'); if(doubtHistory.length === 0) return; list.innerHTML = doubtHistory.map(i => `<div class="p-2 bg-white/5 rounded-lg mb-2 border border-white/5 cursor-pointer hover:bg-white/10 transition-colors" onclick="alert('${i.q}')"><div class="font-bold text-indigo-300 truncate">Q: ${i.q}</div><div class="text-[10px] text-slate-500 truncate">${i.a}</div></div>`).join(''); }
+        function renderDoubtHistory() { const list = document.getElementById('doubt-history-list'); if(!list) return; if(doubtHistory.length === 0) { list.innerHTML = `<div class="text-xs text-slate-500 italic p-3">No doubts logged.</div>`; return; } list.innerHTML = doubtHistory.map(i => `<div class="p-2 bg-white/5 rounded-md"> <div class=\"font-bold text-white text-xs\">${i.q}</div><div class=\"text-[11px] text-slate-400\">${i.a}</div></div>`).join(''); }
         function clearDoubts() { doubtHistory = []; localStorage.removeItem('icai_doubt_history'); renderDoubtHistory(); }
 
         // --- PLANNER ---
@@ -558,19 +571,19 @@
             let time = new Date(`2000-01-01T${start}`); let html = ''; const blocks = Math.floor(hours / 1.5);
             for(let i=1; i<=blocks; i++) {
                 let s = time.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); time.setMinutes(time.getMinutes() + 90); let e = time.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-                html += `<div class="flex items-center gap-3 p-3 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-colors"><div class="w-16 text-center text-xs font-bold text-slate-400">${s}</div><div class="flex-1 border-l pl-3 border-white/10"><div class="text-sm font-bold text-indigo-300">Deep Work ${i}</div><div class="text-[10px] text-slate-500">Single Task Focus</div></div><div class="text-xs font-mono font-bold text-slate-500 bg-black/20 px-2 py-1 rounded">90m</div></div>`;
-                if(i < blocks) { if(i % 3 === 0) { time.setMinutes(time.getMinutes() + 60); html += `<div class="text-center text-[10px] text-amber-400 font-bold my-1 tracking-wider bg-amber-500/10 py-1 rounded-lg border border-amber-500/20">🍽️ MEAL BREAK (60m)</div>`; } else { time.setMinutes(time.getMinutes() + 15); html += `<div class="text-center text-[10px] text-emerald-400 font-bold my-1 tracking-wider">🌱 RECHARGE (15m)</div>`; } }
+                html += `<div class="flex items-center gap-3 p-3 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-colors"><div class="w-16 text-center text-xs font-bold text-slate-200">${s}</div><div class="flex-1 text-[13px] text-slate-300">Focus Block ${i}</div><div class="w-16 text-right text-xs text-slate-400">${e}</div></div>`;
+                if(i < blocks) { if(i % 3 === 0) { time.setMinutes(time.getMinutes() + 60); html += `<div class="text-center text-[10px] text-amber-400 font-bold my-1 tracking-wider bg-amber-500/10 py-2 rounded">Long Break</div>`; } }
             }
-            list.innerHTML = html;
+            if(list) list.innerHTML = html;
         }
 
         // --- TIMER ---
-        function startTimer() { if(timerInterval) return; const display = document.getElementById('timer-display'); let [m, s] = display.innerText.split(':').map(Number); let time = m * 60 + s; document.getElementById('timer-status').innerText = "FOCUS ACTIVE"; document.getElementById('timer-status').className = "relative text-xs text-emerald-400 uppercase font-bold mt-2 tracking-widest animate-pulse"; timerInterval = setInterval(() => { time--; const min = Math.floor(time / 60); const sec = time % 60; display.innerText = `${min}:${sec < 10 ? '0'+sec : sec}`; if(time <= 0) { clearInterval(timerInterval); timerInterval = null; alert("Session Done!"); } }, 1000); }
-        function resetTimer() { clearInterval(timerInterval); timerInterval = null; document.getElementById('timer-display').innerText = timerMode === 'pomodoro' ? "25:00" : "90:00"; document.getElementById('timer-status').innerText = "READY"; document.getElementById('timer-status').className = "relative text-xs text-slate-500 uppercase font-bold mt-2 tracking-widest"; }
+        function startTimer() { if(timerInterval) return; const display = document.getElementById('timer-display'); if(!display) return; let [m, s] = display.innerText.split(':').map(Number); let time = m * 60 + s; const status = document.getElementById('timer-status'); timerInterval = setInterval(() => { if(time <= 0) { clearInterval(timerInterval); timerInterval = null; if(status) status.innerText = 'Done'; return; } time--; const mm = String(Math.floor(time/60)).padStart(2,'0'); const ss = String(time%60).padStart(2,'0'); display.innerText = `${mm}:${ss}`; if(status) status.innerText = 'Running'; }, 1000); }
+        function resetTimer() { clearInterval(timerInterval); timerInterval = null; document.getElementById('timer-display').innerText = timerMode === 'pomodoro' ? "25:00" : "90:00"; const status = document.getElementById('timer-status'); if(status) status.innerText = 'Idle'; }
         function setTimerMode(mode) { timerMode = mode; 
             const pomBtn = document.getElementById('btn-mode-pom'); const deepBtn = document.getElementById('btn-mode-deep');
-            if(mode === 'pomodoro') { pomBtn.classList.add('bg-indigo-600', 'text-white'); pomBtn.classList.remove('text-slate-400'); deepBtn.classList.remove('bg-indigo-600', 'text-white'); deepBtn.classList.add('text-slate-400'); }
-            else { deepBtn.classList.add('bg-indigo-600', 'text-white'); deepBtn.classList.remove('text-slate-400'); pomBtn.classList.remove('bg-indigo-600', 'text-white'); pomBtn.classList.add('text-slate-400'); }
+            if(mode === 'pomodoro') { if(pomBtn) { pomBtn.classList.add('bg-indigo-600', 'text-white'); pomBtn.classList.remove('text-slate-400'); } if(deepBtn) deepBtn.classList.remove('bg-indigo-600', 'text-white');
+            } else { if(deepBtn) { deepBtn.classList.add('bg-indigo-600', 'text-white'); deepBtn.classList.remove('text-slate-400'); } if(pomBtn) pomBtn.classList.remove('bg-indigo-600', 'text-white'); }
             resetTimer(); 
         }
 
@@ -579,43 +592,52 @@
             const sub = document.getElementById('gen-subject').value; const tier = document.getElementById('gen-type').value; 
             const modal = document.getElementById('paper-modal'); const content = document.getElementById('paper-content'); const reveal = document.getElementById('btn-reveal-solutions');
             if(!apiKey) return alert("API Key Needed");
-            modal.classList.remove('hidden'); reveal.classList.add('hidden');
-            document.getElementById('paper-subject-display').innerText = `${sub} (${tier}%)`.toUpperCase();
-            content.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-400"><div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div><p>Architecting Exam Paper...</p></div>`;
+            if(modal) modal.classList.remove('hidden'); if(reveal) reveal.classList.add('hidden');
+            if(document.getElementById('paper-subject-display')) document.getElementById('paper-subject-display').innerText = `${sub} (${tier}%)`.toUpperCase();
+            if(content) content.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-400"><div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div><p class="font-mono text-sm">GENERATING PAPER...</p></div>`;
             currentMockQuestions = "";
 
-            const sys = `You are the ICAI Board of Studies. Create a professionally formatted Mock Test Paper for CA Foundation: ${sub} (${tier}% Syllabus).
-            CRITICAL: **STRICTLY NEW SCHEME ONLY** (No BCR/BCK).
-            FORMAT: Strict HTML.
-            1. Header: <h1>CENTERED BOLD UPPERCASE</h1>. "Total Marks: 100 | Time: 3 Hours".
-            2. Questions: Use <h3> for "Question X". Sub-parts <strong>(a)</strong>. <hr> separators.
-            3. Content: 
-               - Accounts/Maths: Use HTML <table> for data.
-               - Maths: NO LaTeX. Use HTML entities (x², √, ∑).
-               - Law: Scenario-based.
-            4. Solutions: Hidden div id="solutions-block" class="hidden solution-section"><h2>SOLUTIONS & MARKING SCHEME</h2> ... </div>
-            * Precede this block with: <div id="solutions-divider" class="hidden"></div>
-            NO MARKDOWN. ONLY RAW HTML.`;
+            const sys = `You are the ICAI Board of Studies. Create a professionally formatted Mock Test Paper for CA Foundation: ${sub} (${tier}% Syllabus).\nCRITICAL: **STRICTLY NEW SCHEME ONLY** (No BCR/BCK).\nFORMAT: Strict HTML.\n1. Header: <h1>CENTERED BOLD UPPERCASE</h1>. "Total Marks: 100 | Time: 3 Hours".\n2. Questions: Use <h3> for "Question X". Sub-parts <strong>(a)</strong>. <hr> separators.\n3. Content: - Accounts/Maths: Use HTML <table> for data. - Maths: NO LaTeX. Use HTML entities (x², √, ∑). - Law: Scenario-based.\n4. Solutions: Hidden div id="solutions-block" class="hidden solution-section"><h2>SOLUTIONS & MARKING SCHEME</h2> ... </div>\n* Precede this block with: <div id="solutions-divider" class="hidden"></div>\nNO MARKDOWN. ONLY RAW HTML.`;
 
             try { 
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: "Generate Paper" }] }], systemInstruction: { parts: [{ text: sys }] } }) }); 
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: sys }] }], temperature: 0.2 }) });
                 const data = await resp.json(); 
-                const text = data.candidates[0].content.parts[0].text;
-                content.innerHTML = text; 
-                currentMockQuestions = text.split("SOLUTIONS")[0]; 
-                reveal.classList.remove('hidden'); 
-            } catch(e) { content.innerHTML = "Error."; }
+                const text = (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) || '';
+                if(content) content.innerHTML = text || '<div class="p-6">No content returned.</div>';
+
+                // Robust extraction of questions portion: prefer locating solutions-block marker
+                try {
+                    let questionsPart = '';
+                    const lower = text.toLowerCase();
+                    const solIdx = lower.indexOf('id="solutions-block"');
+                    if(solIdx !== -1) {
+                        questionsPart = text.substring(0, solIdx);
+                    } else {
+                        // fallback: split by the word 'solutions' or heading variations
+                        const re = /(\bsolutions\b|<h2[^>]*>\s*solutions\b)/i;
+                        const m = text.search(re);
+                        if(m !== -1) questionsPart = text.substring(0, m);
+                        else questionsPart = text; // last resort
+                    }
+                    // strip tags for storing a compact representation (limit length)
+                    const strip = (s) => s.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+                    currentMockQuestions = strip(questionsPart).substring(0, 2000);
+                } catch(e) { currentMockQuestions = text.substring(0, 2000); }
+
+                if(reveal) reveal.classList.remove('hidden'); 
+            } catch(e) { if(content) content.innerHTML = "Error."; }
         }
-        function toggleSolutions() { document.getElementById('solutions-block').classList.remove('hidden'); document.getElementById('solutions-block').scrollIntoView({behavior: 'smooth'}); }
-        function closePaperModal() { document.getElementById('paper-modal').classList.add('hidden'); }
-        function printPaper() { const c = document.getElementById('paper-content').innerHTML; const w = window.open(); w.document.write(`<html><head><title>Mock Paper</title></head><body style="font-family:serif; line-height:1.6; padding:40px;">${c}</body></html>`); w.print(); w.close(); }
+        function toggleSolutions() { const s = document.getElementById('solutions-block'); if(!s) return alert('No solutions available to reveal.'); s.classList.toggle('hidden'); if(!s.classList.contains('hidden')) s.scrollIntoView({behavior: 'smooth'}); }
+        function closePaperModal() { const m = document.getElementById('paper-modal'); if(m) m.classList.add('hidden'); }
+        function printPaper() { const c = document.getElementById('paper-content'); if(!c) return; const w = window.open(); w.document.write(`<html><head><title>Mock Paper</title></head><body style="font-family:Inter, sans-serif;">${c.innerHTML}</body></html>`); w.document.close(); w.print(); }
         
         function transferToAuditor() {
             closePaperModal();
             switchTab('auditor');
-            document.getElementById('audit-question').value = "Current Mock Test Simulation";
-            document.getElementById('audit-text-fallback').value = "I have written answers for the generated mock. Please evaluate based on the questions generated.";
-            document.getElementById('mock-audit-banner').classList.remove('hidden');
+            const aq = document.getElementById('audit-question'); const at = document.getElementById('audit-text-fallback'); const mb = document.getElementById('mock-audit-banner');
+            if(aq) aq.value = "Current Mock Test Simulation";
+            if(at) at.value = "I have written answers for the generated mock. Please evaluate based on the questions generated.";
+            if(mb) mb.classList.remove('hidden');
         }
 
         // --- CASE STUDY ARCHITECT ---
@@ -624,19 +646,19 @@
             const modal = document.getElementById('paper-modal');
             const content = document.getElementById('paper-content');
             if(!apiKey || !scenario) return alert("API Key & Scenario Required");
-            modal.classList.remove('hidden'); document.getElementById('modal-title').innerText = "Case Study Analysis";
-            document.getElementById('btn-reveal-solutions').classList.add('hidden');
-            content.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-400"><div class="loader mb-4"></div><p>Architecting Solution...</p></div>`;
-            const sys = `You are a CA Examiner. Solve this case study in strict ICAI Format. Output HTML: <h1>CASE ANALYSIS</h1> <h3>1. PROVISION OF LAW</h3>... <h3>2. FACTS OF THE CASE</h3>... <h3>3. ANALYSIS</h3>... <h3>4. CONCLUSION</h3>. NO MARKDOWN.`;
-            try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: scenario }] }], systemInstruction: { parts: [{ text: sys }] } }) }); const d = await r.json(); content.innerHTML = d.candidates[0].content.parts[0].text; } catch(e) { content.innerHTML = "Error."; }
-        }
+            if(modal) modal.classList.remove('hidden'); if(document.getElementById('modal-title')) document.getElementById('modal-title').innerText = "Case Study Analysis";
+            const revealBtn = document.getElementById('btn-reveal-solutions'); if(revealBtn) revealBtn.classList.add('hidden');
+            if(content) content.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-400"><div class="loader mb-4"></div><p>Architecting Solution...</p></div>`;
+            const sys = `You are a CA Examiner. Solve this case study in strict ICAI Format. Output HTML: <h1>CASE ANALYSIS</h1> <h3>1. PROVISION OF LAW</h3>...`;
+            try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: scenario }] }] }) }); const d = await r.json(); const text = (d && d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts && d.candidates[0].content.parts[0] && d.candidates[0].content.parts[0].text) || ''; if(content) content.innerHTML = text; } catch(e) { if(content) content.innerHTML = 'Error.'; } }
 
         // --- AUDIT ---
-        function handleImagePreview(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { base64Image = e.target.result.split(',')[1]; }; reader.readAsDataURL(input.files[0]); } }
+        function handleImagePreview(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { try { const res = e.target.result || ''; base64Image = res.includes(',') ? res.split(',')[1] : res; } catch(ex) { base64Image = null; } }; reader.readAsDataURL(input.files[0]); } }
         async function auditAnswerWithImage() {
-            const q = document.getElementById('audit-question').value; const m = document.getElementById('audit-marks').value; const t = document.getElementById('audit-text-fallback').value; const s = document.getElementById('audit-strictness').value; const out = document.getElementById('audit-result');
+            const q = document.getElementById('audit-question').value; const m = document.getElementById('audit-marks').value || 0; const t = document.getElementById('audit-text-fallback').value; const s = document.getElementById('audit-strictness').value || 'Strict';
+            const out = document.getElementById('audit-result');
             if(!apiKey) return alert("API Key Needed");
-            out.innerHTML = `<div class="flex items-center gap-2 text-indigo-300"><div class="loader"></div> <span>Examiner Checking...</span></div>`;
+            if(out) out.innerHTML = `<div class="flex items-center gap-2 text-indigo-300"><div class="loader"></div> <span>Examiner Checking...</span></div>`;
             
             let contextQ = q;
             if(q === "Current Mock Test Simulation" && currentMockQuestions) {
@@ -647,7 +669,7 @@
             if(base64Image) parts.push({ inlineData: { mimeType: "image/jpeg", data: base64Image } });
             if(t) parts.push({ text: `Student Answer: ${t}` });
             const sys = `ICAI Examiner. Grade out of ${m}. Check Keywords, Sections, Steps. Output HTML breakdown.`;
-            try { const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ role: "user", parts: parts }], systemInstruction: { parts: [{ text: sys }] } }) }); const data = await resp.json(); out.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>'); } catch(e) { out.innerHTML = "Error."; }
+            try { const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: parts }) }); const data = await resp.json(); const ans = (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) || 'No feedback.'; if(out) out.innerHTML = ans; } catch(e) { if(out) out.innerHTML = 'Error.'; }
         }
 
         function addMockScore() {
